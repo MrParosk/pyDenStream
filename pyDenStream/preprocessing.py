@@ -4,7 +4,7 @@ from typing import Tuple
 
 class RollingStats:
     """
-        This class implements rolling statistics, i.e. mean and variance are updated for each new data-point.
+    This class implements rolling statistics, i.e. mean and variance are updated for each new data-point.
     """
 
     def __init__(self, dim: Tuple, eps: float = 1e-10):
