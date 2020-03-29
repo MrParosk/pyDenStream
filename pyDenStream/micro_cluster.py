@@ -74,6 +74,16 @@ class MicroCluster:
         else:
             self.labels_array = np.delete(self.labels_array, [len(self.labels_array) - 1], axis=0)
 
+    def _calculate_fading(self, time: int) -> np.ndarray:
+        """
+        This function calculates the fading values for time for this micro-cluster.
+
+        :param time: The time value for which to compute the fading value for.
+        :return: Array containing the fading values from this micro-cluster.
+        """
+
+        return utils.fading_function(self.lambd, time - self.time_array)
+
     def calculate_radius(self, time: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Calculating the radius of a micro-cluster according to the paper
