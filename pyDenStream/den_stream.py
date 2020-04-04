@@ -1,9 +1,9 @@
 import numpy as np
 import sklearn
-from typing import List, Optional, Callable, Any
+from typing import List, Dict, Optional, Callable, Any
 from warnings import warn
+from inspect import isfunction
 
-from pyDenStream import utils
 from pyDenStream import micro_cluster
 from pyDenStream import preprocessing
 
@@ -37,6 +37,7 @@ class DenStream:
         self.epsilon = epsilon
         self.beta = beta
         self.mu = mu
+        self.lambd = lambd
         self.min_samples = min_samples
         self.distance_measure = distance_measure
 
@@ -206,7 +207,7 @@ class DenStream:
             else:
                 label = None
 
-            self._validate_fit_input(time, feature_array, label)
+            DenStream._validate_fit_input(time, feature_array, label)
 
             if normalize:
                 rs.update_statistics(feature_array)
@@ -267,7 +268,7 @@ class DenStream:
         predicted_labels = local_model.fit_predict(center_array)
         return predicted_labels
 
-    def _compute_label_metric(self, predicted_labels: np.ndarray) -> List:
+    def _compute_label_metric(self, predicted_labels: np.ndarray) -> List[Dict[str, float]]:
         """
         Compute the label metrics given the predicted labels.
 
@@ -275,17 +276,117 @@ class DenStream:
         :return: List of dictionaries with the values for each label metrics.
             It has the key name (i.e. name of the metric) and value (i.e. the value of the metric).
         """
-        pass
+        predicted_list, true_list = [], []
 
-    def _compute_unlabel_metric(self, predicted_labels: np.ndarray) -> List:
+        for idx, predicted_label in enumerate(predicted_labels):
+            true_labels = self.p_micro_clusters[idx].label_array
+            true_list.append(np.array(true_labels))
+
+            repeated_prediction = np.repeat(predicted_label, len(true_labels))
+            predicted_list.append(repeated_prediction)
+
+        true_array = np.concatenate(true_list, axis=0)
+        predicted_array = np.concatenate(predicted_list, axis=0)
+
+        results = []
+        for metric in self.label_metrics_list:
+            val = metric(true_array, predicted_array)
+            result_dict = {"name": metric.__name__, "value": val}
+            results.append(result_dict)
+        return results
+
+    def _compute_unlabel_metric(self, predicted_labels: np.ndarray) -> List[Dict[str, float]]:
         """
-        :param predicted_labels:
-        :return:
+        Compute the un-label metrics given the predicted labels.
+
+        :param predicted_labels: Array of the predicted labels for each p-micro-cluster.
+        :return: List of dictionaries with the values for each un-label metrics.
+            It has the key name (i.e. name of the metric) and value (i.e. the value of the metric).
         """
-        pass
+        predicted_list, feature_list = [], []
 
-    def _validate_fit_input(self, time: int, feature_array: np.ndarray, label: Optional[int] = None):
-        pass
+        for idx, predicted_label in enumerate(predicted_labels):
+            features = self.p_micro_clusters[idx].feature_array
+            feature_list.append(np.array(features))
 
-    def _validate_init_input(self):
-        pass
+            repeated_prediction = np.repeat(predicted_label, len(features))
+            predicted_list.append(repeated_prediction)
+
+        combined_feature_array = np.concatenate(feature_list, axis=0)
+        predicted_array = np.concatenate(predicted_list, axis=0)
+
+        results = []
+        for metric in self.unlabel_metrics_list:
+            val = metric(combined_feature_array, predicted_array)
+            result_dict = {"name": metric.__name__, "value": val}
+            results.append(result_dict)
+        return results
+
+    def _validate_init_input(self) -> None:
+        """
+        Checking that the input to init is valid.
+        """
+
+        if isinstance(self.epsilon, int) or isinstance(self.epsilon, float):
+            if self.epsilon <= 0:
+                raise ValueError("epsilon must be positive.")
+        else:
+            raise ValueError("epsion must be of type float or integer.")
+
+        if isinstance(self.beta, float):
+            if not 0.0 < self.beta <= 1.0:
+                raise ValueError("beta must be between 0.0 and 1.0.")
+        else:
+            raise ValueError("beta must be of type float")
+
+        if isinstance(self.mu, int):
+            if self.mu <= 0:
+                raise ValueError("mu must be positive.")
+        else:
+            raise ValueError("mu must be of type integer.")
+
+        if isinstance(self.min_samples, int):
+            if self.min_samples <= 0:
+                raise ValueError("min_samples must be positive.")
+        else:
+            raise ValueError("min_samples must be of type integer.")
+
+        if isinstance(self.lambd, int) or isinstance(self.lambd, float):
+            if self.min_samples <= 0.0:
+                raise ValueError("lambd must be positive.")
+        else:
+            raise ValueError("lambd must be of type float or integer.")
+
+        if self.beta * self.mu <= 1.0:
+            raise ValueError("beta * mu <= 1.0 which will cause problems when computing Tp.")
+
+        for metric in self.label_metrics_list:
+            if not isfunction(metric):
+                raise ValueError("The label metric input(s) must be a function.")
+
+        for metric in self.unlabel_metrics_list:
+            if not isfunction(metric):
+                raise ValueError("The un-label metric input(s) must be a function.")
+
+    @staticmethod
+    def _validate_fit_input(self, time: int, feature_array: np.ndarray, label: Optional[int] = None) -> None:
+        """
+        Validate the fit_generator's input parameters.
+
+        :param time: The current time.
+        :param feature_array: Array for a given data point p.
+        :param label: Specifying the true label of a data point. None indicates that the label is not provided.
+        """
+
+        if not isinstance(feature_array, np.ndarray):
+            raise ValueError(f"Provided x is not an numpy.ndarray, type(x)={type(feature_array)}")
+        elif len(feature_array.shape) != 2:
+            raise ValueError(f"feature_array need to have the shape (1, num_features), given shape={feature_array.shape}")
+
+        if not isinstance(time, int):
+            raise ValueError(f"Provided time is not an int. type(time)={type(time)}")
+        elif time < 0:
+            raise ValueError(f"Time needs to be positive. time={time}")
+
+        if not isinstance(label, int) and label is not None:
+            raise ValueError(f"Provided label is not an int or None. label={label}")
