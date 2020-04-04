@@ -1,5 +1,5 @@
 import numpy as np
-import sklearn
+import sklearn.cluster
 from typing import List, Dict, Optional, Callable, Any
 from warnings import warn
 from inspect import isfunction
@@ -41,8 +41,11 @@ class DenStream:
         self.min_samples = min_samples
         self.distance_measure = distance_measure
 
-
+        self.label_metrics_list = label_metrics_list
+        self.unlabel_metrics_list = unlabel_metrics_list
+        self.metrics_results = []
         self._validate_init_input()
+
         self.Tp = (1.0 / self.lambd) * np.log((self.beta * self.mu)) / (self.beta * self.mu - 1)
 
         self.o_micro_clusters = []
@@ -51,13 +54,9 @@ class DenStream:
         self.completed_o_clusters = []
         self.completed_p_clusters = []
 
-        self.metrics_results = []
-        self.label_metrics_list = label_metrics_list
-        self.unlabel_metrics_list = unlabel_metrics_list
-
         self.model = sklearn.cluster.DBSCAN(eps=self.epsilon,
                                             min_samples=self.min_samples,
-                                            metrics="euclidean",
+                                            metric="euclidean",
                                             algorithm="auto",
                                             n_jobs=-1)
 
@@ -85,7 +84,7 @@ class DenStream:
         """
 
         xi = (np.power(2, - self.lambd * (time - creation_time + self.Tp)) -1) \
-        / (np.power(2, -self.lamd * self.Tp) - 1)
+        / (np.power(2, -self.lambd * self.Tp) - 1)
         return xi
 
     def _merging(self, current_time: int, feature_array: np.ndarray, label: Optional[int] = None) -> None:
@@ -98,11 +97,11 @@ class DenStream:
         """
 
         if len(self.p_micro_clusters) > 0:
-            closest_p_index = self._find_closest_cluster(self.o_micro_clusters, feature_array)
+            closest_p_index = self._find_closest_cluster(self.p_micro_clusters, feature_array)
             closest_p_cluster = self.p_micro_clusters[closest_p_index]
 
             closest_p_cluster.append(current_time, feature_array, label)
-            r_p, weight, cf1 = closest_p_cluster.calulcate_radius(current_time)
+            r_p, weight, cf1 = closest_p_cluster.calculate_radius(current_time)
 
             if r_p <= self.epsilon:
                 closest_p_cluster.update_parameters(cf1_score=cf1, weight=weight)
@@ -268,7 +267,7 @@ class DenStream:
         predicted_labels = local_model.fit_predict(center_array)
         return predicted_labels
 
-    def _compute_label_metric(self, predicted_labels: np.ndarray) -> List[Dict[str, float]]:
+    def _compute_label_metrics(self, predicted_labels: np.ndarray) -> List[Dict[str, float]]:
         """
         Compute the label metrics given the predicted labels.
 
@@ -279,7 +278,7 @@ class DenStream:
         predicted_list, true_list = [], []
 
         for idx, predicted_label in enumerate(predicted_labels):
-            true_labels = self.p_micro_clusters[idx].label_array
+            true_labels = self.p_micro_clusters[idx].labels_array
             true_list.append(np.array(true_labels))
 
             repeated_prediction = np.repeat(predicted_label, len(true_labels))
@@ -306,7 +305,7 @@ class DenStream:
         predicted_list, feature_list = [], []
 
         for idx, predicted_label in enumerate(predicted_labels):
-            features = self.p_micro_clusters[idx].feature_array
+            features = self.p_micro_clusters[idx].features_array
             feature_list.append(np.array(features))
 
             repeated_prediction = np.repeat(predicted_label, len(features))
@@ -369,7 +368,7 @@ class DenStream:
                 raise ValueError("The un-label metric input(s) must be a function.")
 
     @staticmethod
-    def _validate_fit_input(self, time: int, feature_array: np.ndarray, label: Optional[int] = None) -> None:
+    def _validate_fit_input(time: int, feature_array: np.ndarray, label: Optional[int] = None) -> None:
         """
         Validate the fit_generator's input parameters.
 
