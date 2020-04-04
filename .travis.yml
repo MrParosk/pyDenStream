@@ -9,5 +9,6 @@ install:
   - pip install -e .
 script:
   - pytest
+  - coverage run --source pyDenStream/tests/ -m pytest
 after_success:
   - codecov
