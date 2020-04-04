@@ -8,6 +8,4 @@ install:
   - pip install -r requirements-dev.txt
   - pip install -e .
 script:
-  - coverage run --source pyDenStream/tests/ -m pytest
-after_success:
-  - codecov
+  - pytest
