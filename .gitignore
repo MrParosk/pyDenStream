@@ -1,3 +1,4 @@
 .idea/
 pyDenStream/__pycache__/
 pyDenStream/tests/__pycache__/
+examples/.ipynb_checkpoints/

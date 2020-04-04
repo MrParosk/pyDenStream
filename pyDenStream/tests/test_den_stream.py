@@ -431,19 +431,19 @@ def test_int_list_request_period():
     # Generating data for cluster 2.
     center_2 = np.array([1.0, -1.0]).reshape((1, num_features))
     x_2 = center_2 + np.random.normal(0.0, sigma, [num_samples, num_features])
-    y_2 = np.repeat(0, num_samples).reshape((num_samples, 1))
+    y_2 = np.repeat(1, num_samples).reshape((num_samples, 1))
     t_2 = np.linspace(101, 200, num=num_samples).reshape((num_samples, 1))
 
     # Generating data for cluster 3.
     center_3 = np.array([-1.0, -1.0]).reshape((1, num_features))
     x_3 = center_3 + np.random.normal(0.0, sigma, [num_samples, num_features])
-    y_3 = np.repeat(0, num_samples).reshape((num_samples, 1))
+    y_3 = np.repeat(2, num_samples).reshape((num_samples, 1))
     t_3 = np.linspace(51, 150, num=num_samples).reshape((num_samples, 1))
 
     # Generating data for cluster 4.
     center_4 = np.array([-1.0, 1.0]).reshape((1, num_features))
     x_4 = center_4 + np.random.normal(0.0, sigma, [num_samples, num_features])
-    y_4 = np.repeat(0, num_samples).reshape((num_samples, 1))
+    y_4 = np.repeat(3, num_samples).reshape((num_samples, 1))
     t_4 = np.linspace(51, 150, num=num_samples).reshape((num_samples, 1))
 
     X = np.concatenate([x_1, x_2, x_3, x_4], axis=0).astype(float)
