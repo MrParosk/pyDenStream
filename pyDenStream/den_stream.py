@@ -32,6 +32,7 @@ class DenStream:
             sklearn.metrics.silhouette_score. The functions requires the format function(features, predicted_labels).
         :param distance_measure: Type of distance measure used for finding the closest p-micro-cluster.
             Need to be compatible with numpy.linalg.norm's parameter "ord".
+        :return
         """
 
         self.epsilon = epsilon
@@ -53,6 +54,8 @@ class DenStream:
 
         self.completed_o_clusters = []
         self.completed_p_clusters = []
+
+        self.iterations = 0
 
         self.model = sklearn.cluster.DBSCAN(eps=self.epsilon,
                                             min_samples=self.min_samples,
@@ -94,6 +97,7 @@ class DenStream:
         :param current_time: The current time.
         :param feature_array: Array for a given data point p.
         :param label: Specifying the true label of a data point. None indicates that it is not provided.
+        :return
         """
 
         if len(self.p_micro_clusters) > 0:
@@ -137,6 +141,7 @@ class DenStream:
         Pruning the potential activate clusters.
 
         :param time: The current time.
+        :return
         """
 
         for idx in range(len(self.p_micro_clusters) - 1, -1, -1):
@@ -152,6 +157,7 @@ class DenStream:
         Pruning the outlier activate clusters.
 
         :param time: The current time.
+        :return
         """
 
         for idx in range(len(self.o_micro_clusters) - 1, -1, -1):
@@ -162,6 +168,20 @@ class DenStream:
             if o_cluster.weight < xi:
                 self.completed_o_clusters.append(o_cluster)
                 self.o_micro_clusters.pop(idx)
+
+    def partial_fit(self, feature_array: np.ndarray, time: int, label: Optional[int] = None) -> None:
+        """
+        :param feature_array: Array for a given data point p.
+        :param time: The current time.
+        :param label: Specifying the true label of a data point. None indicates that it is not provided.
+        :return
+        """
+
+        self._merging(time, feature_array, label)
+
+        if time % np.ceil(self.Tp) == 0:
+            self._prune_p_clusters(time)
+            self._prune_o_clusters(time)
 
     def fit_generator(self, generator, normalize: bool = False, request_period: Optional[Any] = None) -> None:
         """
@@ -179,7 +199,11 @@ class DenStream:
                 - An integer, i.e. do the clustering every request_period.
                 - List of integers, i.e. cluster if the iteration number is request_period[idx].
                 - None, i.e. do no cluster with self.model.
+        :return
         """
+
+        if self.iterations > 0:
+            raise RuntimeError("Seems like the method as already been fitted, try to re-create it.")
 
         if normalize:
             try:
@@ -191,9 +215,8 @@ class DenStream:
             rs = preprocessing.RollingStats(feature_array.shape)
             rs.update_statistics(feature_array)
 
-        iterations = 0
         while True:
-            iterations += 1
+            self.iterations += 1
 
             try:
                 gen_dict = generator.__next__()
@@ -213,24 +236,21 @@ class DenStream:
                 rs.update_statistics(feature_array)
                 feature_array = rs.normalize(feature_array)
 
-            self._merging(time, feature_array, label)
-
-            if time % np.ceil(self.Tp) == 0:
-                self._prune_p_clusters(time)
-                self._prune_o_clusters(time)
+            self.partial_fit(feature_array, time, label)
 
             if isinstance(request_period, int):
-                if iterations % request_period == 0:
-                    self._cluster_evaluate(iterations)
+                if self.iterations % request_period == 0:
+                    self._cluster_evaluate(self.iterations)
             elif isinstance(request_period, list):
-                if iterations in request_period:
-                    self._cluster_evaluate(iterations)
+                if self.iterations in request_period:
+                    self._cluster_evaluate(self.iterations)
 
     def _cluster_evaluate(self, iteration: int) -> None:
         """
         Calling request clustering and computing the metrics.
 
         :param iteration: current iteration, i.e. #data-points.
+        :return
         """
 
         predicted_labels = self._request_clustering()
@@ -297,10 +317,10 @@ class DenStream:
 
     def _compute_no_label_metric(self, predicted_labels: np.ndarray) -> List[Dict[str, float]]:
         """
-        Compute the un-label metrics given the predicted labels.
+        Compute the no-label metrics given the predicted labels.
 
         :param predicted_labels: Array of the predicted labels for each p-micro-cluster.
-        :return: List of dictionaries with the values for each un-label metrics.
+        :return: List of dictionaries with the values for each no-label metrics.
             It has the key name (i.e. name of the metric) and value (i.e. the value of the metric).
         """
         predicted_list, feature_list = [], []
@@ -325,6 +345,7 @@ class DenStream:
     def _validate_init_input(self) -> None:
         """
         Checking that the input to init is valid.
+        :return
         """
 
         if isinstance(self.epsilon, int) or isinstance(self.epsilon, float):
@@ -366,7 +387,7 @@ class DenStream:
 
         for metric in self.no_label_metrics_list:
             if not isfunction(metric):
-                raise ValueError("The un-label metric input(s) must be a function.")
+                raise ValueError("The no-label metric input(s) must be a function.")
 
     @staticmethod
     def _validate_fit_input(time: int, feature_array: np.ndarray, label: Optional[int] = None) -> None:
@@ -376,6 +397,7 @@ class DenStream:
         :param time: The current time.
         :param feature_array: Array for a given data point p.
         :param label: Specifying the true label of a data point. None indicates that the label is not provided.
+        :return
         """
 
         if not isinstance(feature_array, np.ndarray):

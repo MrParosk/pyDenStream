@@ -15,6 +15,7 @@ class MicroCluster:
 
         :param creation_time: The creation time (i.e. "now") for this micro-cluster.
         :param lambd: Fading factor for this cluster.
+        :return
         """
 
         self.lambd = lambd
@@ -37,6 +38,7 @@ class MicroCluster:
         :param time: The time to append.
         :param feature_array: Array for a given data-point. Must have the shape (1, num_features).
         :param label: Specifying the true cluster label of a data-point. None indicates that it is not given.
+        :return
         """
 
         time_array = np.array(time).reshape((1, 1))
@@ -60,6 +62,8 @@ class MicroCluster:
     def pop(self) -> None:
         """
         This function pops out the last data-point (i.e. the len(features_array) -1 element).
+
+        :return
         """
 
         assert(len(self.features_array) == len(self.time_array))
@@ -112,6 +116,7 @@ class MicroCluster:
             - If "cf1_score" and "weight" is given, simply use them. This is done to avoid recomputing them.
 
         :param kwargs:
+        :return
         """
 
         if "time" in kwargs:
