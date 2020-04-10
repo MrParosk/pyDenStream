@@ -7,7 +7,7 @@ TOL = 1e-6
 
 def test_fading_cf1():
     """
-    This test is designed to check that the fading calculations and the cf1 calcualations works as expected.
+    This test is designed to check that the fading calculations and the cf1 calculations works as expected.
     """
 
     t = 3
@@ -64,7 +64,7 @@ def test_radius():
     mc.append(t3, x3)
 
     # (cf1 / w) squared
-    expected_c1 = (21.75 + 14 / np.sqrt(2)) / (11/4 + 3 / np.sqrt(2))
+    expected_c1 = (21.75 + 14 / np.sqrt(2)) / (11 / 4 + 3 / np.sqrt(2))
 
     # abs(cf2 / w)
     expected_c2 = (0.5 + 16 / np.sqrt(2) + 2 + 25 / np.sqrt(2)) / (1.5 + 1 / np.sqrt(2))

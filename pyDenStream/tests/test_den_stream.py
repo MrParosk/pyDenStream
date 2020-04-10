@@ -252,9 +252,7 @@ def test_fit_generator_fading():
         [-4.01, -4.01], [300.0, 300.0], [10.0, -10.0]
     ])
 
-
-    time_input = [4, 1, 1, 1, 1,
-                  4, 1, 4]
+    time_input = [4, 1, 1, 1, 1, 4, 1, 4]
 
     def generator(feature_arrays, time_list):
         for i in range(0, len(time_input)):
@@ -370,7 +368,7 @@ def test_compute_metrics():
     x1_c1 = np.array([4.1, 3.9]).reshape((1, 2))
     x2_c1 = np.array([4.0, 4.0]).reshape((1, 2))
 
-    c1  = MicroCluster(1, lambd)
+    c1 = MicroCluster(1, lambd)
     c1.append(1, x1_c1, 1)
     c1.append(1, x2_c1, 1)
     c1.update_parameters(time=1)
@@ -399,7 +397,7 @@ def test_compute_metrics():
     c4.update_parameters(time=1)
 
     # Creating DenStream and appending the micro-clusters.
-    ds = DenStream(eps, beta, mu, lambd, min_samples,  label_metrics_list=[metrics.homogeneity_score])
+    ds = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list=[metrics.homogeneity_score])
     ds.p_micro_clusters.append(c1)
     ds.p_micro_clusters.append(c2)
     ds.p_micro_clusters.append(c3)
@@ -470,14 +468,14 @@ def test_int_list_request_period():
     mu = 10
     min_samples = 1
     label_metrics_list = [metrics.homogeneity_score, metrics.completeness_score]
-    unlabel_metrics_list = [metrics.silhouette_score, metrics.calinski_harabasz_score]
+    no_label_metrics_list = [metrics.silhouette_score, metrics.calinski_harabasz_score]
 
     gen_int = generator(X, Y, T)
-    ds_int = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, unlabel_metrics_list)
+    ds_int = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
     ds_int.fit_generator(gen_int, request_period=100, normalize=True)
 
     gen_list = generator(X, Y, T)
-    ds_list = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, unlabel_metrics_list)
+    ds_list = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
     ds_list.fit_generator(gen_list, request_period=[100, 200, 300, 400], normalize=True)
 
     for i in range(len(ds_int.metrics_results)):

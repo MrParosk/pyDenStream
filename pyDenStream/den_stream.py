@@ -18,7 +18,7 @@ class DenStream:
     """
 
     def __init__(self, epsilon: float, beta: float, mu: int, lambd: float, min_samples: int,
-                 label_metrics_list: List[Callable] = [], unlabel_metrics_list: List[Callable] = [],
+                 label_metrics_list: List[Callable] = [], no_label_metrics_list: List[Callable] = [],
                  distance_measure: Optional[str] = None):
         """
         :param epsilon: The radius used by the micro-cluster and DBScan.
@@ -26,10 +26,10 @@ class DenStream:
         :param mu: Weight factor used by the micro-clusters.
         :param lambd: Fading factor.
         :param min_samples: Minimum number of samples used in DBScan.
-        :param label_metrics_list: List of function used to evaluate the cluster quality with labels,
-            e.g. sklearn.metrics.v_measure_score. The function needs to be of the format function(true_labels, predicted_labels).
-        :param unlabel_metrics_list: List of function used to evaluate the cluster quality without labels,
-            e.g. sklearn.metrics.silhouette_score. The function needs to be of the format function(features, predicted_labels).
+        :param label_metrics_list: List of function used to evaluate the cluster quality with labels, e.g.
+            sklearn.metrics.v_measure_score. The functions requires the format function(true_labels, predicted_labels).
+        :param no_label_metrics_list: List of functions used to evaluate the cluster quality without labels, e.g.
+            sklearn.metrics.silhouette_score. The functions requires the format function(features, predicted_labels).
         :param distance_measure: Type of distance measure used for finding the closest p-micro-cluster.
             Need to be compatible with numpy.linalg.norm's parameter "ord".
         """
@@ -42,7 +42,7 @@ class DenStream:
         self.distance_measure = distance_measure
 
         self.label_metrics_list = label_metrics_list
-        self.unlabel_metrics_list = unlabel_metrics_list
+        self.no_label_metrics_list = no_label_metrics_list
         self.metrics_results = []
         self._validate_init_input()
 
@@ -83,8 +83,8 @@ class DenStream:
         :return: The xi value.
         """
 
-        xi = (np.power(2, - self.lambd * (time - creation_time + self.Tp)) -1) \
-        / (np.power(2, -self.lambd * self.Tp) - 1)
+        xi = (np.power(2, - self.lambd * (time - creation_time + self.Tp)) - 1) / \
+            (np.power(2, -self.lambd * self.Tp) - 1)
         return xi
 
     def _merging(self, current_time: int, feature_array: np.ndarray, label: Optional[int] = None) -> None:
@@ -163,7 +163,7 @@ class DenStream:
                 self.completed_o_clusters.append(o_cluster)
                 self.o_micro_clusters.pop(idx)
 
-    def fit_generator(self, generator, normalize: bool=False, request_period: Optional[Any] = None) -> None:
+    def fit_generator(self, generator, normalize: bool = False, request_period: Optional[Any] = None) -> None:
         """
         Fitting DenStream to a stream of data-points (i.e. python generator).
             It will run until the generator does not have any data points left.
@@ -174,10 +174,11 @@ class DenStream:
             label [Optional[int]]: the true label of the data point. Needed for self.label_metrics_list.
         :param normalize: Whether to normalize the features to zero mean and unit variance.
             The normalization is done with rolling statistics, i.e. update mean and variance iterable.
-        :param request_period: Specifying when (in terms of #data-points) we should compute the clusters. It can have the types:
-            - An integer, i.e. do the clustering every request_period.
-            - List of integers, i.e. cluster if the iteration number is request_period[idx].
-            - None, i.e. do no cluster with self.model.
+        :param request_period: Specifying when (in terms of #data-points) we should compute the clusters.
+            It can have the types:
+                - An integer, i.e. do the clustering every request_period.
+                - List of integers, i.e. cluster if the iteration number is request_period[idx].
+                - None, i.e. do no cluster with self.model.
         """
 
         if normalize:
@@ -239,12 +240,12 @@ class DenStream:
 
             if len(self.label_metrics_list) > 0:
                 metrics += self._compute_label_metrics(predicted_labels)
-            if len(self.unlabel_metrics_list) > 0:
+            if len(self.no_label_metrics_list) > 0:
                 # Checking that we have atleast two clusters (exluding outlier clusters, i.e. label=-1).
                 if len(set(predicted_labels[predicted_labels != -1])) > 1:
-                    metrics += self._compute_unlabel_metric(predicted_labels)
+                    metrics += self._compute_no_label_metric(predicted_labels)
                 else:
-                    warn(f"Number of predicted clusters are 1 or less. Therefore unlabel metrics are not computed!")
+                    warn(f"Number of predicted clusters are 1 or less. Therefore no-label-metrics are not computed!")
             if len(metrics) > 0:
                 self.metrics_results.append({"iteration": iteration, "metrics": metrics})
         else:
@@ -262,7 +263,7 @@ class DenStream:
         else:
             return np.ndarray([])
 
-        # TODO: Should the new clusters be connected? I.e. if micro-cluster 1 and 2 and connected, should they be merged?
+        # TODO: Should the new clusters be connected? I.e. if micro-cluster 1 and 2 and connected, should they be merged
         local_model = sklearn.base.clone(self.model)
         predicted_labels = local_model.fit_predict(center_array)
         return predicted_labels
@@ -294,7 +295,7 @@ class DenStream:
             results.append(result_dict)
         return results
 
-    def _compute_unlabel_metric(self, predicted_labels: np.ndarray) -> List[Dict[str, float]]:
+    def _compute_no_label_metric(self, predicted_labels: np.ndarray) -> List[Dict[str, float]]:
         """
         Compute the un-label metrics given the predicted labels.
 
@@ -315,7 +316,7 @@ class DenStream:
         predicted_array = np.concatenate(predicted_list, axis=0)
 
         results = []
-        for metric in self.unlabel_metrics_list:
+        for metric in self.no_label_metrics_list:
             val = metric(combined_feature_array, predicted_array)
             result_dict = {"name": metric.__name__, "value": val}
             results.append(result_dict)
@@ -363,7 +364,7 @@ class DenStream:
             if not isfunction(metric):
                 raise ValueError("The label metric input(s) must be a function.")
 
-        for metric in self.unlabel_metrics_list:
+        for metric in self.no_label_metrics_list:
             if not isfunction(metric):
                 raise ValueError("The un-label metric input(s) must be a function.")
 
@@ -380,7 +381,8 @@ class DenStream:
         if not isinstance(feature_array, np.ndarray):
             raise ValueError(f"Provided x is not an numpy.ndarray, type(x)={type(feature_array)}")
         elif len(feature_array.shape) != 2:
-            raise ValueError(f"feature_array need to have the shape (1, num_features), given shape={feature_array.shape}")
+            raise ValueError(f"feature_array need to have the shape (1, num_features), "
+                             f"given shape={feature_array.shape}")
 
         if not isinstance(time, int):
             raise ValueError(f"Provided time is not an int. type(time)={type(time)}")
