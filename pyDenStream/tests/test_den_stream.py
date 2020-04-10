@@ -1,6 +1,8 @@
 import numpy as np
 from sklearn import metrics
+from sklearn.cluster import KMeans
 
+from .test_helpers import generate_test_data
 from pyDenStream.den_stream import DenStream
 from pyDenStream.micro_cluster import MicroCluster
 
@@ -413,54 +415,34 @@ def test_int_list_request_period():
     This test checks that we get the same evaluation metrics for request_period with int and lists.
     """
 
-    np.random.seed(42)
+    eps = 0.3
+    lambd = 0.1
+    beta = 0.2
+    mu = 10
+    min_samples = 1
+    label_metrics_list = [metrics.homogeneity_score, metrics.completeness_score]
+    no_label_metrics_list = [metrics.silhouette_score, metrics.calinski_harabasz_score]
 
-    num_samples = 100
-    num_features = 2
+    gen_int = generate_test_data()
+    ds_int = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
+    ds_int.fit_generator(gen_int, request_period=100, normalize=True)
 
-    sigma = 0.1
+    gen_list = generate_test_data()
+    ds_list = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
+    ds_list.fit_generator(gen_list, request_period=[100, 200, 300, 400], normalize=True)
 
-    # Generating data for cluster 1.
-    center_1 = np.array([1.0, 1.0]).reshape((1, num_features))
-    x_1 = center_1 + np.random.normal(0.0, sigma, [num_samples, num_features])
-    y_1 = np.repeat(0, num_samples).reshape((num_samples, 1))
-    t_1 = np.linspace(1, 100, num=num_samples).reshape((num_samples, 1))
+    for i in range(len(ds_int.metrics_results)):
+        int_metrics_i = ds_int.metrics_results[i]["metrics"]
+        list_metrics_i = ds_list.metrics_results[i]["metrics"]
 
-    # Generating data for cluster 2.
-    center_2 = np.array([1.0, -1.0]).reshape((1, num_features))
-    x_2 = center_2 + np.random.normal(0.0, sigma, [num_samples, num_features])
-    y_2 = np.repeat(1, num_samples).reshape((num_samples, 1))
-    t_2 = np.linspace(101, 200, num=num_samples).reshape((num_samples, 1))
+        for j in range(len(int_metrics_i)):
+            assert(np.abs(int_metrics_i[j]["value"] - list_metrics_i[j]["value"]) < TOL)
 
-    # Generating data for cluster 3.
-    center_3 = np.array([-1.0, -1.0]).reshape((1, num_features))
-    x_3 = center_3 + np.random.normal(0.0, sigma, [num_samples, num_features])
-    y_3 = np.repeat(2, num_samples).reshape((num_samples, 1))
-    t_3 = np.linspace(51, 150, num=num_samples).reshape((num_samples, 1))
 
-    # Generating data for cluster 4.
-    center_4 = np.array([-1.0, 1.0]).reshape((1, num_features))
-    x_4 = center_4 + np.random.normal(0.0, sigma, [num_samples, num_features])
-    y_4 = np.repeat(3, num_samples).reshape((num_samples, 1))
-    t_4 = np.linspace(51, 150, num=num_samples).reshape((num_samples, 1))
-
-    X = np.concatenate([x_1, x_2, x_3, x_4], axis=0).astype(float)
-    Y = np.concatenate([y_1, y_2, y_3, y_4], axis=0).astype(int)
-    T = np.concatenate([t_1, t_2, t_3, t_4], axis=0).astype(int)
-
-    # Sorting data s.t. they come in time order.
-    idx = np.argsort(T, axis=0).reshape(T.shape[0],)
-    X = X[idx, :]
-    Y = Y[idx, :]
-    T = T[idx, :]
-
-    def generator(X, Y, T):
-        for i in range(0, X.shape[0]):
-            yield {
-                "time": int(T[i, :]),
-                "feature_array": X[i, :].reshape((1, X.shape[1])),
-                "label": int(Y[i, :])
-            }
+def test_set_cluster_method():
+    """
+    This test checks that setting a new clustering method works.
+    """
 
     eps = 0.3
     lambd = 0.1
@@ -470,12 +452,16 @@ def test_int_list_request_period():
     label_metrics_list = [metrics.homogeneity_score, metrics.completeness_score]
     no_label_metrics_list = [metrics.silhouette_score, metrics.calinski_harabasz_score]
 
-    gen_int = generator(X, Y, T)
+    gen_int = generate_test_data()
     ds_int = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
+    model_int = KMeans(n_clusters=2, random_state=42)
+    ds_int.set_clustering_model(model_int)
     ds_int.fit_generator(gen_int, request_period=100, normalize=True)
 
-    gen_list = generator(X, Y, T)
+    gen_list = generate_test_data()
     ds_list = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
+    model_list = KMeans(n_clusters=2, random_state=42)
+    ds_list.set_clustering_model(model_list)
     ds_list.fit_generator(gen_list, request_period=[100, 200, 300, 400], normalize=True)
 
     for i in range(len(ds_int.metrics_results)):

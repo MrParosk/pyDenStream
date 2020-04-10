@@ -1,5 +1,6 @@
 import numpy as np
 import sklearn.cluster
+from sklearn.base import BaseEstimator
 from typing import List, Dict, Optional, Callable, Any
 from warnings import warn
 from inspect import isfunction
@@ -244,6 +245,23 @@ class DenStream:
             elif isinstance(request_period, list):
                 if self.iterations in request_period:
                     self._cluster_evaluate(self.iterations)
+
+    def set_clustering_model(self, new_model: BaseEstimator) -> None:
+        """
+        This method allows the user to use another clustering method than DBScan, e.g. K-Means.
+        Note that it needs to be a sklearn model.
+        Example usage:
+            new_model = sklearn.cluster.KMeans(n_clusters=2)
+            DenStream.set_clustering_model(new_model)
+
+        :param new_model: A sklearn clustering model.
+        :return:
+        """
+
+        if not isinstance(new_model, BaseEstimator):
+            raise ValueError("The new model needs to be a sklearn-model.")
+
+        self.model = new_model
 
     def _cluster_evaluate(self, iteration: int) -> None:
         """
