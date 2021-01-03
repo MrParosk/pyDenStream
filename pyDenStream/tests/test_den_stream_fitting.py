@@ -43,11 +43,10 @@ class TestDenStreamFitting(unittest.TestCase):
 
         ds.fit_generator(gen)
 
-        assert(len(ds.o_micro_clusters) == 3)
-        assert(len(ds.p_micro_clusters) == 2)
-        assert(len(ds.completed_o_clusters) == 0)
-        assert(len(ds.completed_p_clusters) == 0)
-
+        self.assertEqual(len(ds.o_micro_clusters), 3)
+        self.assertEqual(len(ds.p_micro_clusters), 2)
+        self.assertEqual(len(ds.completed_o_clusters), 0)
+        self.assertEqual(len(ds.completed_p_clusters), 0)
 
     def test_fit_generator_fading(self):
         """
@@ -82,25 +81,24 @@ class TestDenStreamFitting(unittest.TestCase):
         ds.fit_generator(gen)
 
         # Asserting that the activate p/o-micro-clusters have the expected size/number of data points.
-        assert(len(ds.o_micro_clusters) == 1)
-        assert(len(ds.o_micro_clusters[0].features_array) == 1)
-        assert(len(ds.o_micro_clusters[0].time_array) == 1)
+        self.assertEqual(len(ds.o_micro_clusters), 1)
+        self.assertEqual(len(ds.o_micro_clusters[0].features_array), 1)
+        self.assertEqual(len(ds.o_micro_clusters[0].time_array), 1)
 
-        assert(len(ds.p_micro_clusters) == 1)
-        assert(len(ds.p_micro_clusters[0].features_array) == 2)
-        assert(len(ds.p_micro_clusters[0].time_array) == 2)
+        self.assertEqual(len(ds.p_micro_clusters), 1)
+        self.assertEqual(len(ds.p_micro_clusters[0].features_array), 2)
+        self.assertEqual(len(ds.p_micro_clusters[0].time_array), 2)
 
         # Checking that the inactivate p/o-micro-clusters have the expected size / number of data-points.
-        assert(len(ds.completed_p_clusters) == 1)
-        assert(len(ds.completed_p_clusters[0].features_array) == 3)
-        assert(len(ds.completed_p_clusters[0].time_array) == 3)
+        self.assertEqual(len(ds.completed_p_clusters), 1)
+        self.assertEqual(len(ds.completed_p_clusters[0].features_array), 3)
+        self.assertEqual(len(ds.completed_p_clusters[0].time_array), 3)
 
-        assert(len(ds.completed_o_clusters) == 2)
-        assert(len(ds.completed_o_clusters[0].features_array) == 1)
-        assert(len(ds.completed_o_clusters[0].time_array) == 1)
-        assert(len(ds.completed_o_clusters[1].features_array) == 1)
-        assert(len(ds.completed_o_clusters[1].time_array) == 1)
-
+        self.assertEqual(len(ds.completed_o_clusters), 2)
+        self.assertEqual(len(ds.completed_o_clusters[0].features_array), 1)
+        self.assertEqual(len(ds.completed_o_clusters[0].time_array), 1)
+        self.assertEqual(len(ds.completed_o_clusters[1].features_array), 1)
+        self.assertEqual(len(ds.completed_o_clusters[1].time_array), 1)
 
     def test_request_clustering(self):
         """
@@ -157,8 +155,7 @@ class TestDenStreamFitting(unittest.TestCase):
 
         labels = ds._request_clustering()
         expected_labels = np.array([0, 0, 1, 1, -1, -1])
-        assert(np.array_equal(labels, expected_labels))
-
+        self.assertTrue(np.array_equal(labels, expected_labels))
 
     def test_compute_metrics(self):
         """
@@ -213,8 +210,7 @@ class TestDenStreamFitting(unittest.TestCase):
 
         pred_labels = ds._request_clustering()
         computed_value = ds._compute_label_metrics(pred_labels)[0]["value"]
-        assert(np.abs(computed_value - 0.5) < self.TOL)
-
+        self.assertTrue(np.abs(computed_value - 0.5) < self.TOL)
 
     def test_int_list_request_period(self):
         """
@@ -242,8 +238,7 @@ class TestDenStreamFitting(unittest.TestCase):
             list_metrics_i = ds_list.metrics_results[i]["metrics"]
 
             for j in range(len(int_metrics_i)):
-                assert(np.abs(int_metrics_i[j]["value"] - list_metrics_i[j]["value"]) < self.TOL)
-
+                self.assertTrue(np.abs(int_metrics_i[j]["value"] - list_metrics_i[j]["value"]) < self.TOL)
 
     def test_set_cluster_method(self):
         """
@@ -275,7 +270,7 @@ class TestDenStreamFitting(unittest.TestCase):
             list_metrics_i = ds_list.metrics_results[i]["metrics"]
 
             for j in range(len(int_metrics_i)):
-                assert(np.abs(int_metrics_i[j]["value"] - list_metrics_i[j]["value"]) < self.TOL)
+                self.assertTrue(np.abs(int_metrics_i[j]["value"] - list_metrics_i[j]["value"]) < self.TOL)
 
 
 if __name__ == "__main__":

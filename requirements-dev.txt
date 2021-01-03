@@ -1,2 +1,2 @@
 pytest>=6.2
-pytest-pep8>=1.0
+pytest-pycodestyle>=2.2

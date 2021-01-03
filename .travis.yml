@@ -6,8 +6,7 @@ python:
   - "3.7"
   - "3.8"
 install:
-  - pip install -r requirements.txt
+  - pip install .
   - pip install -r requirements-dev.txt
-  - pip install -e .
 script:
-  - pytest --pep8
+  - pytest --pycodestyle

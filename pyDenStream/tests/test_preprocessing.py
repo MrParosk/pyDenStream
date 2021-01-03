@@ -22,8 +22,8 @@ class TestPreprocessing(unittest.TestCase):
         expected_mean = np.array([150, 1.5]).reshape((1, 2))
         expected_variance = np.array([2.5e3, 2.5e-1]).reshape((1, 2))
 
-        assert(np.linalg.norm(rs.mean - expected_mean) < self.TOL)
-        assert(np.linalg.norm(rs.variance - expected_variance) < self.TOL)
+        self.assertTrue(np.linalg.norm(rs.mean - expected_mean) < self.TOL)
+        self.assertTrue(np.linalg.norm(rs.variance - expected_variance) < self.TOL)
 
 
 if __name__ == "__main__":

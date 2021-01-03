@@ -26,8 +26,7 @@ class TestUtils(unittest.TestCase):
         expected_array = np.array([0.5, 0.25, 0.125, 0.0625]).reshape((4, 1))
         actual_array = utils.fading_function(lambd_array, time_array)
 
-        assert(np.linalg.norm(actual_array - expected_array) < self.TOL)
-
+        self.assertTrue(np.linalg.norm(actual_array - expected_array) < self.TOL)
 
     def test_cf1_calculations(self):
         """
@@ -41,8 +40,7 @@ class TestUtils(unittest.TestCase):
         np_cf1 = utils.numpy_cf1(x, fading_array)
         numba_cf1 = utils.numba_cf1(x, fading_array)
 
-        assert(np.linalg.norm(np_cf1 - numba_cf1) < self.TOL)
-
+        self.assertTrue(np.linalg.norm(np_cf1 - numba_cf1) < self.TOL)
 
     def test_cf2_calculations(self):
         """
@@ -56,7 +54,7 @@ class TestUtils(unittest.TestCase):
         np_cf2 = utils.numpy_cf2(x, fading_array)
         numba_cf2 = utils.numba_cf2(x, fading_array)
 
-        assert(np.linalg.norm(np_cf2 - numba_cf2) < self.TOL)
+        self.assertTrue(np.linalg.norm(np_cf2 - numba_cf2) < self.TOL)
 
 
 if __name__ == "__main__":

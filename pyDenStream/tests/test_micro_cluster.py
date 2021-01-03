@@ -33,13 +33,13 @@ class TestMicroCluster(unittest.TestCase):
         # Check that the fading calculation works
         estimated_fading = mc._calculate_fading(t)
         expected_fading = np.array([0.5, 1 / np.sqrt(2), 1]).reshape((3, 1))
-        assert(np.linalg.norm(estimated_fading - expected_fading) < self.TOL)
+        self.assertTrue(np.linalg.norm(estimated_fading - expected_fading) < self.TOL)
 
         # Check that the CF1 calculation works
         x = mc.features_array
         estimated_cf1 = mc.cf1_func(x, estimated_fading)
         expected_cf1 = np.array([0.5 + 4 / np.sqrt(2), 1 + 5 / np.sqrt(2)]).reshape((1, 2))
-        assert(np.linalg.norm(estimated_cf1 - expected_cf1) < self.TOL)
+        self.assertTrue(np.linalg.norm(estimated_cf1 - expected_cf1) < self.TOL)
 
     def test_radius(self):
         """
@@ -73,8 +73,7 @@ class TestMicroCluster(unittest.TestCase):
         expected_radius = np.sqrt(expected_c2 - expected_c1)
         estimated_radius, _, _ = mc.calculate_radius(t)
 
-        assert(np.abs(estimated_radius - expected_radius) < self.TOL)
-
+        self.assertTrue(np.abs(estimated_radius - expected_radius) < self.TOL)
 
     def test_adding_updating(self):
         """
@@ -97,18 +96,18 @@ class TestMicroCluster(unittest.TestCase):
         t3 = 3.0
 
         # Check that the array is initially empty
-        assert(len(mc.features_array) == 0)
-        assert(len(mc.time_array) == 0)
+        self.assertEqual(len(mc.features_array), 0)
+        self.assertEqual(len(mc.time_array), 0)
 
         # Adding one point
         mc.append(t1, x1)
-        assert(len(mc.features_array) == 1)
-        assert(len(mc.time_array) == 1)
+        self.assertEqual(len(mc.features_array), 1)
+        self.assertEqual(len(mc.time_array), 1)
 
         # Asserting that the append comes in the correct order
         mc.append(t2, x2)
         expected_time_array = np.array([t1, t2]).reshape((2, 1))
-        assert(np.linalg.norm(mc.time_array - expected_time_array) < self.TOL)
+        self.assertTrue(np.linalg.norm(mc.time_array - expected_time_array) < self.TOL)
 
         # Checking so that the update works
         mc.append(t3, x3)
@@ -119,9 +118,8 @@ class TestMicroCluster(unittest.TestCase):
         expected_center = np.array([0.5 + 4 / np.sqrt(2), 1 + 5 / np.sqrt(2)]).reshape((1, 2))
         expected_center = expected_center / expected_weight
 
-        assert(np.abs(mc.weight - expected_weight) < self.TOL)
-        assert(np.linalg.norm(mc.center - expected_center) < self.TOL)
-
+        self.assertTrue(np.abs(mc.weight - expected_weight) < self.TOL)
+        self.assertTrue(np.linalg.norm(mc.center - expected_center) < self.TOL)
 
     def test_update_parameters_same(self):
         """
@@ -146,8 +144,8 @@ class TestMicroCluster(unittest.TestCase):
         radius, weight, cf1 = c2.calculate_radius(time)
         c2.update_parameters(cf1_score=cf1, weight=weight)
 
-        assert(np.abs(c1.weight - c2.weight) < self.TOL)
-        assert(np.linalg.norm(c1.center - c2.center) < self.TOL)
+        self.assertTrue(np.abs(c1.weight - c2.weight) < self.TOL)
+        self.assertTrue(np.linalg.norm(c1.center - c2.center) < self.TOL)
 
 
 if __name__ == "__main__":

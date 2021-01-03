@@ -51,8 +51,7 @@ class TestDenStreamCore(unittest.TestCase):
 
         feature_array = np.array([4.1, 4.1]).reshape((1, 2))
         closest_index = ds._find_closest_cluster(ds.p_micro_clusters, feature_array)
-        assert(closest_index == 1)
-
+        self.assertTrue(closest_index == 1)
 
     def test_merging_points(self):
         """
@@ -100,14 +99,13 @@ class TestDenStreamCore(unittest.TestCase):
 
         # Testing that the data point get to the correct cluster,
         # i.e. p_potential to c1 and p_outlier to a new outlier cluster.
-        assert(len(ds.p_micro_clusters) == 2)
-        assert(len(ds.p_micro_clusters[0].features_array) == 3)
-        assert(len(ds.p_micro_clusters[1].features_array) == 2)
+        self.assertEqual(len(ds.p_micro_clusters), 2)
+        self.assertEqual(len(ds.p_micro_clusters[0].features_array), 3)
+        self.assertEqual(len(ds.p_micro_clusters[1].features_array), 2)
 
-        assert(len(ds.o_micro_clusters) == 2)
-        assert(len(ds.o_micro_clusters[0].features_array) == 2)
-        assert(len(ds.o_micro_clusters[1].features_array) == 1)
-
+        self.assertEqual(len(ds.o_micro_clusters), 2)
+        self.assertEqual(len(ds.o_micro_clusters[0].features_array), 2)
+        self.assertEqual(len(ds.o_micro_clusters[1].features_array), 1)
 
     def test_no_clusters(self):
         """
@@ -119,21 +117,20 @@ class TestDenStreamCore(unittest.TestCase):
         beta = 1.0
 
         ds = DenStream(self.eps, beta, self.mu, self.lambd, self.min_samples)
-        assert(len(ds.p_micro_clusters) == 0)
-        assert (len(ds.o_micro_clusters) == 0)
+        self.assertEqual(len(ds.p_micro_clusters), 0)
+        self.assertEqual(len(ds.o_micro_clusters), 0)
 
         feature_array_1 = np.array([100.0, 100.0]).reshape((1, 2))
         ds._merging(1, feature_array_1)
 
-        assert(len(ds.p_micro_clusters) == 0)
-        assert (len(ds.o_micro_clusters) == 1)
+        self.assertEqual(len(ds.p_micro_clusters), 0)
+        self.assertEqual(len(ds.o_micro_clusters), 1)
 
         feature_array_2 = np.array([-100.0, -100.0]).reshape((1, 2))
         ds._merging(1, feature_array_2)
 
-        assert (len(ds.p_micro_clusters) == 0)
-        assert (len(ds.o_micro_clusters) == 2)
-
+        self.assertEqual(len(ds.p_micro_clusters), 0)
+        self.assertEqual(len(ds.o_micro_clusters), 2)
 
     def test_moving_o_to_p_cluster(self):
         """
@@ -175,17 +172,17 @@ class TestDenStreamCore(unittest.TestCase):
         ds._merging(1, o_potential)
 
         # Testing that the p and o micro-clusters has the expected number of clusters.
-        assert(len(ds.o_micro_clusters) == 1)
-        assert(len(ds.p_micro_clusters) == 2)
+        self.assertEqual(len(ds.o_micro_clusters), 1)
+        self.assertEqual(len(ds.p_micro_clusters), 2)
 
         # Testing that p and o clusters contains the expected number of points.
-        assert(len(ds.p_micro_clusters[0].time_array) == 2)
-        assert (len(ds.p_micro_clusters[0].features_array) == 2)
-        assert(len(ds.p_micro_clusters[1].time_array) == 3)
-        assert (len(ds.p_micro_clusters[1].features_array) == 3)
+        self.assertEqual(len(ds.p_micro_clusters[0].time_array), 2)
+        self.assertEqual(len(ds.p_micro_clusters[0].features_array), 2)
+        self.assertEqual(len(ds.p_micro_clusters[1].time_array), 3)
+        self.assertEqual(len(ds.p_micro_clusters[1].features_array), 3)
 
-        assert(len(ds.o_micro_clusters[0].time_array) == 2)
-        assert (len(ds.o_micro_clusters[0].features_array) == 2)
+        self.assertEqual(len(ds.o_micro_clusters[0].time_array), 2)
+        self.assertEqual(len(ds.o_micro_clusters[0].features_array), 2)
 
 
 if __name__ == "__main__":
