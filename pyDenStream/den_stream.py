@@ -283,7 +283,7 @@ class DenStream:
                 if len(set(predicted_labels[predicted_labels != -1])) > 1:
                     metrics += self._compute_no_label_metric(predicted_labels)
                 else:
-                    warn(f"Number of predicted clusters are 1 or less. Therefore no-label-metrics are not computed!")
+                    warn("Number of predicted clusters are 1 or less. Therefore no-label-metrics are not computed!")
             if len(metrics) > 0:
                 self.metrics_results.append({"iteration": iteration, "metrics": metrics})
         else:
