@@ -1,2 +1,2 @@
-pytest
-pytest-pep8
+pytest>=6.2
+pytest-pep8>=1.0
