@@ -1,6 +1,6 @@
 # pyDenStream
 
-![pyDenStream package](https://github.com/MrParosk/pyDenStream/workflows/pyDenStream%20package/badge.svg)
+![master](https://github.com/MrParosk/pyDenStream/workflows/master/badge.svg?branch=master)
 
 Implementation of the algorithm [Density-Based Clustering over an Evolving Data Stream with Noise](https://archive.siam.org/meetings/sdm06/proceedings/030caof.pdf) in Python.
 
