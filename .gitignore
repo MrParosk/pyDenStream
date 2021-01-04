@@ -1,4 +1,4 @@
-.idea/
-pyDenStream/__pycache__/
-pyDenStream/tests/__pycache__/
+denstream/__pycache__/
+denstream/tests/__pycache__/
+denstream.egg-info/
 examples/.ipynb_checkpoints/

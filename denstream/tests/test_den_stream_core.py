@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
 
-from pyDenStream.den_stream import DenStream
-from pyDenStream.micro_cluster import MicroCluster
+from denstream.den_stream import DenStream
+from denstream.micro_cluster import MicroCluster
 
 
 class TestDenStreamCore(unittest.TestCase):

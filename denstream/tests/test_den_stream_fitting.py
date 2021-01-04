@@ -4,8 +4,8 @@ from sklearn.cluster import KMeans
 import unittest
 
 from .test_helpers import generate_test_data
-from pyDenStream.den_stream import DenStream
-from pyDenStream.micro_cluster import MicroCluster
+from denstream.den_stream import DenStream
+from denstream.micro_cluster import MicroCluster
 
 
 class TestDenStreamFitting(unittest.TestCase):

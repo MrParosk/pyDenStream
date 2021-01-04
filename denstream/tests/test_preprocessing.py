@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from pyDenStream import preprocessing
+from denstream import preprocessing
 
 
 class TestPreprocessing(unittest.TestCase):

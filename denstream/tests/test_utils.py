@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from pyDenStream import utils
+from denstream import utils
 
 
 class TestUtils(unittest.TestCase):

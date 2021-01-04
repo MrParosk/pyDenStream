@@ -1,6 +1,6 @@
 import numpy as np
-from pyDenStream import utils
 from typing import Tuple, Optional
+from denstream import utils
 
 
 class MicroCluster:

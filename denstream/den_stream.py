@@ -5,8 +5,8 @@ from typing import List, Dict, Optional, Callable, Any
 from warnings import warn
 from inspect import isfunction
 
-from pyDenStream import micro_cluster
-from pyDenStream import preprocessing
+from denstream import micro_cluster
+from denstream import preprocessing
 
 
 class DenStream:

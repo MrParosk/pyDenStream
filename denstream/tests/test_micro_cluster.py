@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from pyDenStream import micro_cluster
+from denstream import micro_cluster
 
 
 class TestMicroCluster(unittest.TestCase):
