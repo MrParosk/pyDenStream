@@ -1,3 +1,4 @@
+.vscode/
 denstream/__pycache__/
 denstream/tests/__pycache__/
 denstream.egg-info/

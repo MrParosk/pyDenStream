@@ -170,19 +170,35 @@ class DenStream:
                 self.completed_o_clusters.append(o_cluster)
                 self.o_micro_clusters.pop(idx)
 
-    def partial_fit(self, feature_array: np.ndarray, time: int, label: Optional[int] = None) -> None:
+    def partial_fit(self, feature_array: np.ndarray, time: int, label: Optional[int] = None,
+                    request_period: Optional[Any] = None) -> None:
         """
         :param feature_array: Array for a given data point p.
         :param time: The current time.
         :param label: Specifying the true label of a data point. None indicates that it is not provided.
+        :param request_period: Specifying when (in terms of #data-points) we should compute the clusters.
+            It can have the types:
+                - An integer, i.e. do the clustering every request_period.
+                - List of integers, i.e. cluster if the iteration number is request_period[idx].
+                - None, i.e. do no cluster with self.model.
         :return
         """
+
+        DenStream._validate_fit_input(time, feature_array, label)
+        self.iterations += 1
 
         self._merging(time, feature_array, label)
 
         if time % np.ceil(self.Tp) == 0:
             self._prune_p_clusters(time)
             self._prune_o_clusters(time)
+
+        if isinstance(request_period, int):
+            if self.iterations % request_period == 0:
+                self._cluster_evaluate(self.iterations)
+        elif isinstance(request_period, list):
+            if self.iterations in request_period:
+                self._cluster_evaluate(self.iterations)
 
     def fit_generator(self, generator, normalize: bool = False, request_period: Optional[Any] = None) -> None:
         """
@@ -217,8 +233,6 @@ class DenStream:
             rs.update_statistics(feature_array)
 
         while True:
-            self.iterations += 1
-
             try:
                 gen_dict = generator.__next__()
             except StopIteration:
@@ -231,20 +245,12 @@ class DenStream:
             else:
                 label = None
 
-            DenStream._validate_fit_input(time, feature_array, label)
-
             if normalize:
+                DenStream._validate_fit_input(time, feature_array, label)
                 rs.update_statistics(feature_array)
                 feature_array = rs.normalize(feature_array)
 
-            self.partial_fit(feature_array, time, label)
-
-            if isinstance(request_period, int):
-                if self.iterations % request_period == 0:
-                    self._cluster_evaluate(self.iterations)
-            elif isinstance(request_period, list):
-                if self.iterations in request_period:
-                    self._cluster_evaluate(self.iterations)
+            self.partial_fit(feature_array, time, label, request_period=request_period)
 
     def set_clustering_model(self, new_model: BaseEstimator) -> None:
         """
@@ -299,7 +305,7 @@ class DenStream:
         if len(self.p_micro_clusters) > 0:
             center_array = np.concatenate([c.center for c in self.p_micro_clusters], axis=0)
         else:
-            return np.ndarray([])
+            return np.empty(0)
 
         # TODO: Should the new clusters be connected? I.e. if micro-cluster 1 and 2 and connected, should they be merged
         local_model = sklearn.base.clone(self.model)

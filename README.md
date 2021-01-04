@@ -6,9 +6,12 @@ Implementation of the algorithm [Density-Based Clustering over an Evolving Data 
 
 ## Installation
 
-- Note: We currently only support Python 3.6, 3.7, 3.8.
-- Clone this repository.
-- Install using pip:
-  ```Shell
-  # Make sure you are in the pyDenStream directory.
-  pip install .
+```Shell
+git clone https://github.com/MrParosk/pyDenStream.git
+cd pyDenStream
+pip install .
+```
+
+## Example
+
+An example how to use this package is included in the directory examples.
