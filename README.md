@@ -7,9 +7,7 @@ Implementation of the algorithm [Density-Based Clustering over an Evolving Data 
 ## Installation
 
 ```Shell
-git clone https://github.com/MrParosk/pyDenStream.git
-cd pyDenStream
-pip install .
+pip install git+https://github.com/MrParosk/pyDenStream.git
 ```
 
 ## Example
