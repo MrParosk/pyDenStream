@@ -14,4 +14,4 @@ pip install .
 
 ## Example
 
-An example how to use this package is included in the directory examples.
+An example how to use this package is included in *examples/user_guide.ipynb*.

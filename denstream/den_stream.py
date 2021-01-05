@@ -200,7 +200,8 @@ class DenStream:
             if self.iterations in request_period:
                 self._cluster_evaluate(self.iterations)
 
-    def fit_generator(self, generator, normalize: bool = False, request_period: Optional[Any] = None) -> None:
+    def fit_generator(self, generator, normalize: bool = False, request_period: Optional[Any] = None,
+                      warmup_period: int = 1) -> None:
         """
         Fitting DenStream to a stream of data-points (i.e. python generator).
             It will run until the generator does not have any data points left.
@@ -216,6 +217,7 @@ class DenStream:
                 - An integer, i.e. do the clustering every request_period.
                 - List of integers, i.e. cluster if the iteration number is request_period[idx].
                 - None, i.e. do no cluster with self.model.
+        :param warmup_period: The number of samples used to "warm-up" the rolling mean and variance, if normalize=True.
         :return
         """
 
@@ -223,14 +225,15 @@ class DenStream:
             raise RuntimeError("Seems like the method as already been fitted, try to re-create it.")
 
         if normalize:
-            try:
-                gen_dict = generator.__next__()
-            except StopIteration:
-                raise ValueError("Given generator was empty")
+            for _ in range(warmup_period):
+                try:
+                    gen_dict = generator.__next__()
+                except StopIteration:
+                    raise RuntimeError(f"Not enough samples where given for the warmup-period, warmup_period={warmup_period}")
 
-            feature_array = gen_dict["feature_array"]
-            rs = preprocessing.RollingStats(feature_array.shape)
-            rs.update_statistics(feature_array)
+                feature_array = gen_dict["feature_array"]
+                rs = preprocessing.RollingStats(feature_array.shape)
+                rs.update_statistics(feature_array)
 
         while True:
             try:

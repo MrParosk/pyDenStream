@@ -25,4 +25,4 @@ jobs:
         pip install -r requirements-dev.txt
     - name: Tests
       run: |
-        pytest --pycodestyle
+        pytest --pycodestyle .
