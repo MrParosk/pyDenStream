@@ -1,5 +1,5 @@
 .vscode/
 denstream/__pycache__/
-denstream/tests/__pycache__/
+tests/__pycache__/
 denstream.egg-info/
 examples/.ipynb_checkpoints/
