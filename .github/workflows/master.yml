@@ -28,6 +28,6 @@ jobs:
         flake8 denstream/
     - name: Unit-tests with coverage
       run: |
-        pytest --mypy --cov=denstream --cov-report=xml denstream
+        pytest --mypy --cov=./ --cov-report=xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
