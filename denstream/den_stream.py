@@ -45,16 +45,16 @@ class DenStream:
 
         self.label_metrics_list = label_metrics_list
         self.no_label_metrics_list = no_label_metrics_list
-        self.metrics_results = []
+        self.metrics_results: List[Dict[str, Optional[Any]]] = []
         self._validate_init_input()
 
         self.Tp = (1.0 / self.lambd) * np.log((self.beta * self.mu)) / (self.beta * self.mu - 1)
 
-        self.o_micro_clusters = []
-        self.p_micro_clusters = []
+        self.o_micro_clusters: List[micro_cluster.MicroCluster] = []
+        self.p_micro_clusters: List[micro_cluster.MicroCluster] = []
 
-        self.completed_o_clusters = []
-        self.completed_p_clusters = []
+        self.completed_o_clusters: List[micro_cluster.MicroCluster] = []
+        self.completed_p_clusters: List[micro_cluster.MicroCluster] = []
 
         self.iterations = 0
 
@@ -76,7 +76,7 @@ class DenStream:
         cluster_centers = np.concatenate([c.center for c in cluster_list], axis=0)
         dist = np.linalg.norm(feature_array - cluster_centers, axis=1, ord=self.distance_measure)
         closest_cluster_index = np.argmin(dist)
-        return closest_cluster_index
+        return int(closest_cluster_index)
 
     def _calculate_xi(self, time: int, creation_time: int) -> float:
         """

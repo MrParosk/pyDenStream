@@ -12,4 +12,5 @@ setup(name='denstream',
       author_email='TBC',
       packages=['denstream'],
       install_requires=required,
+      setup_requires=['wheel']
       )

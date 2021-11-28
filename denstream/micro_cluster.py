@@ -25,8 +25,8 @@ class MicroCluster:
         self.time_array = np.array([])
         self.labels_array = np.array([])
 
-        self.weight = None
-        self.center = None
+        self.weight = np.nan
+        self.center = np.array([])
 
         self.cf1_func = utils.numba_cf1
         self.cf2_func = utils.numba_cf2

@@ -23,11 +23,11 @@ jobs:
       run: |
         pip install .
         pip install -r requirements-dev.txt
-    - name: Pep8 checks
+    - name: flake8 check
       run: |
-        pycodestyle .
+        flake8 denstream/
     - name: Unit-tests with coverage
       run: |
-        pytest --cov=./ --cov-report=xml
+        pytest --mypy --cov=denstream --cov-report=xml denstream
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
