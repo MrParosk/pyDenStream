@@ -2,7 +2,7 @@ import numpy as np
 from numba import jit
 
 
-def fading_function(lambd: float, time: int) -> np.ndarray:
+def fading_function(lambd: float, time: np.ndarray) -> np.ndarray:
     """
     Calculating the fading value.
 
