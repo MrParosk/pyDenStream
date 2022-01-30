@@ -17,7 +17,7 @@ class TestUtils(unittest.TestCase):
         # Testing fading function for scalar values
         lambd = 1.0
         time = 2
-        assert(np.abs(utils.fading_function(lambd, time) - 0.25) < self.TOL)
+        assert np.abs(utils.fading_function(lambd, time) - 0.25) < self.TOL
 
         # Testing fading function for numpy arrays
         lambd_array = np.repeat(lambd, 4).reshape((4, 1))

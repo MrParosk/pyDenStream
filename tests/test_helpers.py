@@ -10,7 +10,7 @@ def generator(X, Y, T):
         yield {
             "time": int(T[i, :]),
             "feature_array": X[i, :].reshape((1, X.shape[1])),
-            "label": int(Y[i, :])
+            "label": int(Y[i, :]),
         }
 
 
@@ -55,7 +55,9 @@ def generate_test_data():
     T = np.concatenate([t_1, t_2, t_3, t_4], axis=0).astype(int)
 
     # Sorting data s.t. they come in time order.
-    idx = np.argsort(T, axis=0).reshape(T.shape[0], )
+    idx = np.argsort(T, axis=0).reshape(
+        T.shape[0],
+    )
     X = X[idx, :]
     Y = Y[idx, :]
     T = T[idx, :]

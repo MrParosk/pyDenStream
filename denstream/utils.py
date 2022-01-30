@@ -11,7 +11,7 @@ def fading_function(lambd: float, time: int) -> np.ndarray:
     :return: The calculated fading array.
     """
 
-    return np.power(2, - lambd * time, dtype=np.float32)
+    return np.power(2, -lambd * time, dtype=np.float32)
 
 
 def numpy_cf1(x: np.ndarray, fading_array: np.ndarray) -> np.ndarray:

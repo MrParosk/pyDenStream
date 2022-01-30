@@ -38,7 +38,9 @@ class TestMicroCluster(unittest.TestCase):
         # Check that the CF1 calculation works
         x = mc.features_array
         estimated_cf1 = mc.cf1_func(x, estimated_fading)
-        expected_cf1 = np.array([0.5 + 4 / np.sqrt(2), 1 + 5 / np.sqrt(2)]).reshape((1, 2))
+        expected_cf1 = np.array([0.5 + 4 / np.sqrt(2), 1 + 5 / np.sqrt(2)]).reshape(
+            (1, 2)
+        )
         self.assertTrue(np.linalg.norm(estimated_cf1 - expected_cf1) < self.TOL)
 
     def test_radius(self):
@@ -68,7 +70,9 @@ class TestMicroCluster(unittest.TestCase):
         expected_c1 = (21.75 + 14 / np.sqrt(2)) / (11 / 4 + 3 / np.sqrt(2))
 
         # abs(cf2 / w)
-        expected_c2 = (0.5 + 16 / np.sqrt(2) + 2 + 25 / np.sqrt(2)) / (1.5 + 1 / np.sqrt(2))
+        expected_c2 = (0.5 + 16 / np.sqrt(2) + 2 + 25 / np.sqrt(2)) / (
+            1.5 + 1 / np.sqrt(2)
+        )
 
         expected_radius = np.sqrt(expected_c2 - expected_c1)
         estimated_radius, _, _ = mc.calculate_radius(t)
@@ -115,7 +119,9 @@ class TestMicroCluster(unittest.TestCase):
         mc.update_parameters(time=t)
 
         expected_weight = 1.5 + 1 / np.sqrt(2)
-        expected_center = np.array([0.5 + 4 / np.sqrt(2), 1 + 5 / np.sqrt(2)]).reshape((1, 2))
+        expected_center = np.array([0.5 + 4 / np.sqrt(2), 1 + 5 / np.sqrt(2)]).reshape(
+            (1, 2)
+        )
         expected_center = expected_center / expected_weight
 
         self.assertTrue(np.abs(mc.weight - expected_weight) < self.TOL)

@@ -18,10 +18,18 @@ class TestDenStreamFitting(unittest.TestCase):
         The input have two expected p-micro-clusters and three expected o-micro-clusters.
         """
 
-        x_inputs = np.array([
-            [4.0, 4.0], [-4.0, -4.0], [3.99, 3.99], [-10.0, -10.0], [4.01, 4.01],
-            [-4.01, -4.01], [300.0, 300.0], [10.0, -10.0]
-        ])
+        x_inputs = np.array(
+            [
+                [4.0, 4.0],
+                [-4.0, -4.0],
+                [3.99, 3.99],
+                [-10.0, -10.0],
+                [4.01, 4.01],
+                [-4.01, -4.01],
+                [300.0, 300.0],
+                [10.0, -10.0],
+            ]
+        )
 
         time_input = [1, 1, 1, 1, 1, 1, 1, 1]
 
@@ -29,7 +37,7 @@ class TestDenStreamFitting(unittest.TestCase):
             for i in range(0, len(time_input)):
                 yield {
                     "time": time_list[i],
-                    "feature_array": feature_arrays[i, :].reshape((1, 2))
+                    "feature_array": feature_arrays[i, :].reshape((1, 2)),
                 }
 
         eps = 1
@@ -54,10 +62,18 @@ class TestDenStreamFitting(unittest.TestCase):
             to the completed ones.
         """
 
-        x_inputs = np.array([
-            [-4.0, -4.0], [4.0, 4.0], [3.99, 3.99], [-10.0, 10.0], [4.01, 4.01],
-            [-4.01, -4.01], [300.0, 300.0], [10.0, -10.0]
-        ])
+        x_inputs = np.array(
+            [
+                [-4.0, -4.0],
+                [4.0, 4.0],
+                [3.99, 3.99],
+                [-10.0, 10.0],
+                [4.01, 4.01],
+                [-4.01, -4.01],
+                [300.0, 300.0],
+                [10.0, -10.0],
+            ]
+        )
 
         time_input = [4, 1, 1, 1, 1, 4, 1, 4]
 
@@ -66,7 +82,7 @@ class TestDenStreamFitting(unittest.TestCase):
                 print(i)
                 yield {
                     "time": time_list[i],
-                    "feature_array": feature_arrays[i, :].reshape((1, 2))
+                    "feature_array": feature_arrays[i, :].reshape((1, 2)),
                 }
 
         eps = 1
@@ -202,7 +218,14 @@ class TestDenStreamFitting(unittest.TestCase):
         c4.update_parameters(time=1)
 
         # Creating DenStream and appending the micro-clusters.
-        ds = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list=[metrics.homogeneity_score])
+        ds = DenStream(
+            eps,
+            beta,
+            mu,
+            lambd,
+            min_samples,
+            label_metrics_list=[metrics.homogeneity_score],
+        )
         ds.p_micro_clusters.append(c1)
         ds.p_micro_clusters.append(c2)
         ds.p_micro_clusters.append(c3)
@@ -223,22 +246,34 @@ class TestDenStreamFitting(unittest.TestCase):
         mu = 10
         min_samples = 1
         label_metrics_list = [metrics.homogeneity_score, metrics.completeness_score]
-        no_label_metrics_list = [metrics.silhouette_score, metrics.calinski_harabasz_score]
+        no_label_metrics_list = [
+            metrics.silhouette_score,
+            metrics.calinski_harabasz_score,
+        ]
 
         gen_int = generate_test_data()
-        ds_int = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
+        ds_int = DenStream(
+            eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list
+        )
         ds_int.fit_generator(gen_int, request_period=100, normalize=True)
 
         gen_list = generate_test_data()
-        ds_list = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
-        ds_list.fit_generator(gen_list, request_period=[100, 200, 300, 400], normalize=True)
+        ds_list = DenStream(
+            eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list
+        )
+        ds_list.fit_generator(
+            gen_list, request_period=[100, 200, 300, 400], normalize=True
+        )
 
         for i in range(len(ds_int.metrics_results)):
             int_metrics_i = ds_int.metrics_results[i]["metrics"]
             list_metrics_i = ds_list.metrics_results[i]["metrics"]
 
             for j in range(len(int_metrics_i)):
-                self.assertTrue(np.abs(int_metrics_i[j]["value"] - list_metrics_i[j]["value"]) < self.TOL)
+                self.assertTrue(
+                    np.abs(int_metrics_i[j]["value"] - list_metrics_i[j]["value"])
+                    < self.TOL
+                )
 
     def test_set_cluster_method(self):
         """
@@ -251,26 +286,38 @@ class TestDenStreamFitting(unittest.TestCase):
         mu = 10
         min_samples = 1
         label_metrics_list = [metrics.homogeneity_score, metrics.completeness_score]
-        no_label_metrics_list = [metrics.silhouette_score, metrics.calinski_harabasz_score]
+        no_label_metrics_list = [
+            metrics.silhouette_score,
+            metrics.calinski_harabasz_score,
+        ]
 
         gen_int = generate_test_data()
-        ds_int = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
+        ds_int = DenStream(
+            eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list
+        )
         model_int = KMeans(n_clusters=2, random_state=42)
         ds_int.set_clustering_model(model_int)
         ds_int.fit_generator(gen_int, request_period=100, normalize=True)
 
         gen_list = generate_test_data()
-        ds_list = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
+        ds_list = DenStream(
+            eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list
+        )
         model_list = KMeans(n_clusters=2, random_state=42)
         ds_list.set_clustering_model(model_list)
-        ds_list.fit_generator(gen_list, request_period=[100, 200, 300, 400], normalize=True)
+        ds_list.fit_generator(
+            gen_list, request_period=[100, 200, 300, 400], normalize=True
+        )
 
         for i in range(len(ds_int.metrics_results)):
             int_metrics_i = ds_int.metrics_results[i]["metrics"]
             list_metrics_i = ds_list.metrics_results[i]["metrics"]
 
             for j in range(len(int_metrics_i)):
-                self.assertTrue(np.abs(int_metrics_i[j]["value"] - list_metrics_i[j]["value"]) < self.TOL)
+                self.assertTrue(
+                    np.abs(int_metrics_i[j]["value"] - list_metrics_i[j]["value"])
+                    < self.TOL
+                )
 
 
 if __name__ == "__main__":
