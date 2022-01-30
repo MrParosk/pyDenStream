@@ -1,11 +1,13 @@
+import unittest
+
 import numpy as np
 from sklearn import metrics
 from sklearn.cluster import KMeans
-import unittest
 
-from .test_helpers import generate_test_data
 from denstream.den_stream import DenStream
 from denstream.micro_cluster import MicroCluster
+
+from .test_helpers import generate_test_data
 
 
 class TestDenStreamFitting(unittest.TestCase):

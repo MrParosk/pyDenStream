@@ -1,4 +1,5 @@
 import unittest
+
 import numpy as np
 
 from denstream.den_stream import DenStream

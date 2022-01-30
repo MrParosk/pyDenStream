@@ -1,12 +1,12 @@
+from inspect import isfunction
+from typing import Any, Callable, Dict, List, Optional
+from warnings import warn
+
 import numpy as np
 import sklearn.cluster
 from sklearn.base import BaseEstimator
-from typing import List, Dict, Optional, Callable, Any
-from warnings import warn
-from inspect import isfunction
 
-from denstream import micro_cluster
-from denstream import preprocessing
+from denstream import micro_cluster, preprocessing
 
 
 class DenStream:
