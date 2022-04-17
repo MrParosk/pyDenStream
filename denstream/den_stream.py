@@ -56,11 +56,7 @@ class DenStream:
         self.metrics_results: List[Dict[str, Optional[Any]]] = []
         self._validate_init_input()
 
-        self.Tp = (
-            (1.0 / self.lambd)
-            * np.log((self.beta * self.mu))
-            / (self.beta * self.mu - 1)
-        )
+        self.Tp = (1.0 / self.lambd) * np.log((self.beta * self.mu)) / (self.beta * self.mu - 1)
 
         self.o_micro_clusters: List[micro_cluster.MicroCluster] = []
         self.p_micro_clusters: List[micro_cluster.MicroCluster] = []
@@ -78,9 +74,7 @@ class DenStream:
             n_jobs=-1,
         )
 
-    def _find_closest_cluster(
-        self, cluster_list: List[micro_cluster.MicroCluster], feature_array: np.ndarray
-    ) -> int:
+    def _find_closest_cluster(self, cluster_list: List[micro_cluster.MicroCluster], feature_array: np.ndarray) -> int:
         """
         Function for finding the closest cluster for a given point p (feature_array).
 
@@ -90,9 +84,7 @@ class DenStream:
         """
 
         cluster_centers = np.concatenate([c.center for c in cluster_list], axis=0)
-        dist = np.linalg.norm(
-            feature_array - cluster_centers, axis=1, ord=self.distance_measure
-        )
+        dist = np.linalg.norm(feature_array - cluster_centers, axis=1, ord=self.distance_measure)
         closest_cluster_index = np.argmin(dist)
         return int(closest_cluster_index)
 
@@ -105,14 +97,10 @@ class DenStream:
         :return: The xi value.
         """
 
-        xi = (np.power(2, -self.lambd * (time - creation_time + self.Tp)) - 1) / (
-            np.power(2, -self.lambd * self.Tp) - 1
-        )
+        xi = (np.power(2, -self.lambd * (time - creation_time + self.Tp)) - 1) / (np.power(2, -self.lambd * self.Tp) - 1)
         return xi
 
-    def _merging(
-        self, current_time: int, feature_array: np.ndarray, label: Optional[int] = None
-    ) -> None:
+    def _merging(self, current_time: int, feature_array: np.ndarray, label: Optional[int] = None) -> None:
         """
         The merging step of a point p (feature_array) as described in the paper.
 
@@ -123,9 +111,7 @@ class DenStream:
         """
 
         if len(self.p_micro_clusters) > 0:
-            closest_p_index = self._find_closest_cluster(
-                self.p_micro_clusters, feature_array
-            )
+            closest_p_index = self._find_closest_cluster(self.p_micro_clusters, feature_array)
             closest_p_cluster = self.p_micro_clusters[closest_p_index]
 
             closest_p_cluster.append(current_time, feature_array, label)
@@ -138,9 +124,7 @@ class DenStream:
                 closest_p_cluster.pop()
 
         if len(self.o_micro_clusters) > 0:
-            closest_o_index = self._find_closest_cluster(
-                self.o_micro_clusters, feature_array
-            )
+            closest_o_index = self._find_closest_cluster(self.o_micro_clusters, feature_array)
             closest_o_cluster = self.o_micro_clusters[closest_o_index]
 
             closest_o_cluster.append(current_time, feature_array, label)
@@ -257,18 +241,14 @@ class DenStream:
         """
 
         if self.iterations > 0:
-            raise RuntimeError(
-                "Seems like the method as already been fitted, try to re-create it."
-            )
+            raise RuntimeError("Seems like the method as already been fitted, try to re-create it.")
 
         if normalize:
             for _ in range(warmup_period):
                 try:
                     gen_dict = generator.__next__()
                 except StopIteration:
-                    raise RuntimeError(
-                        f"Not enough samples where given for the warmup-period, warmup_period={warmup_period}"
-                    )
+                    raise RuntimeError(f"Not enough samples where given for the warmup-period, warmup_period={warmup_period}")
 
                 feature_array = gen_dict["feature_array"]
                 rs = preprocessing.RollingStats(feature_array.shape)
@@ -331,13 +311,9 @@ class DenStream:
                 if len(set(predicted_labels[predicted_labels != -1])) > 1:
                     metrics += self._compute_no_label_metric(predicted_labels)
                 else:
-                    warn(
-                        "Number of predicted clusters are 1 or less. Therefore no-label-metrics are not computed!"
-                    )
+                    warn("Number of predicted clusters are 1 or less. Therefore no-label-metrics are not computed!")
             if len(metrics) > 0:
-                self.metrics_results.append(
-                    {"iteration": iteration, "metrics": metrics}
-                )
+                self.metrics_results.append({"iteration": iteration, "metrics": metrics})
         else:
             self.metrics_results.append({"iteration": iteration, "metrics": None})
 
@@ -349,9 +325,7 @@ class DenStream:
         """
 
         if len(self.p_micro_clusters) > 0:
-            center_array = np.concatenate(
-                [c.center for c in self.p_micro_clusters], axis=0
-            )
+            center_array = np.concatenate([c.center for c in self.p_micro_clusters], axis=0)
         else:
             return np.empty(0)
 
@@ -360,9 +334,7 @@ class DenStream:
         predicted_labels = local_model.fit_predict(center_array)
         return predicted_labels
 
-    def _compute_label_metrics(
-        self, predicted_labels: np.ndarray
-    ) -> List[Dict[str, float]]:
+    def _compute_label_metrics(self, predicted_labels: np.ndarray) -> List[Dict[str, float]]:
         """
         Compute the label metrics given the predicted labels.
 
@@ -389,9 +361,7 @@ class DenStream:
             results.append(result_dict)
         return results
 
-    def _compute_no_label_metric(
-        self, predicted_labels: np.ndarray
-    ) -> List[Dict[str, float]]:
+    def _compute_no_label_metric(self, predicted_labels: np.ndarray) -> List[Dict[str, float]]:
         """
         Compute the no-label metrics given the predicted labels.
 
@@ -455,9 +425,7 @@ class DenStream:
             raise ValueError("lambd must be of type float or integer.")
 
         if self.beta * self.mu <= 1.0:
-            raise ValueError(
-                "beta * mu <= 1.0 which will cause problems when computing Tp."
-            )
+            raise ValueError("beta * mu <= 1.0 which will cause problems when computing Tp.")
 
         for metric in self.label_metrics_list:
             if not isfunction(metric):
@@ -468,9 +436,7 @@ class DenStream:
                 raise ValueError("The no-label metric input(s) must be a function.")
 
     @staticmethod
-    def _validate_fit_input(
-        time: int, feature_array: np.ndarray, label: Optional[int] = None
-    ) -> None:
+    def _validate_fit_input(time: int, feature_array: np.ndarray, label: Optional[int] = None) -> None:
         """
         Validate the fit_generator's input parameters.
 
@@ -481,14 +447,9 @@ class DenStream:
         """
 
         if not isinstance(feature_array, np.ndarray):
-            raise ValueError(
-                f"Provided x is not an numpy.ndarray, type(x)={type(feature_array)}"
-            )
+            raise ValueError(f"Provided x is not an numpy.ndarray, type(x)={type(feature_array)}")
         elif len(feature_array.shape) != 2:
-            raise ValueError(
-                f"feature_array need to have the shape (1, num_features), "
-                f"given shape={feature_array.shape}"
-            )
+            raise ValueError(f"feature_array need to have the shape (1, num_features), " f"given shape={feature_array.shape}")
 
         if not isinstance(time, int):
             raise ValueError(f"Provided time is not an int. type(time)={type(time)}")

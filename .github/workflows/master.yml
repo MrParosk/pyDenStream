@@ -28,7 +28,7 @@ jobs:
         flake8 .
     - name: isort check
       run: |
-        isort -c . --profile black
+        isort . --check
     - name: black check
       run: |
         black . --check

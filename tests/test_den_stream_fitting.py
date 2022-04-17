@@ -254,28 +254,19 @@ class TestDenStreamFitting(unittest.TestCase):
         ]
 
         gen_int = generate_test_data()
-        ds_int = DenStream(
-            eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list
-        )
+        ds_int = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
         ds_int.fit_generator(gen_int, request_period=100, normalize=True)
 
         gen_list = generate_test_data()
-        ds_list = DenStream(
-            eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list
-        )
-        ds_list.fit_generator(
-            gen_list, request_period=[100, 200, 300, 400], normalize=True
-        )
+        ds_list = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
+        ds_list.fit_generator(gen_list, request_period=[100, 200, 300, 400], normalize=True)
 
         for i in range(len(ds_int.metrics_results)):
             int_metrics_i = ds_int.metrics_results[i]["metrics"]
             list_metrics_i = ds_list.metrics_results[i]["metrics"]
 
             for j in range(len(int_metrics_i)):
-                self.assertTrue(
-                    np.abs(int_metrics_i[j]["value"] - list_metrics_i[j]["value"])
-                    < self.TOL
-                )
+                self.assertTrue(np.abs(int_metrics_i[j]["value"] - list_metrics_i[j]["value"]) < self.TOL)
 
     def test_set_cluster_method(self):
         """
@@ -294,32 +285,23 @@ class TestDenStreamFitting(unittest.TestCase):
         ]
 
         gen_int = generate_test_data()
-        ds_int = DenStream(
-            eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list
-        )
+        ds_int = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
         model_int = KMeans(n_clusters=2, random_state=42)
         ds_int.set_clustering_model(model_int)
         ds_int.fit_generator(gen_int, request_period=100, normalize=True)
 
         gen_list = generate_test_data()
-        ds_list = DenStream(
-            eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list
-        )
+        ds_list = DenStream(eps, beta, mu, lambd, min_samples, label_metrics_list, no_label_metrics_list)
         model_list = KMeans(n_clusters=2, random_state=42)
         ds_list.set_clustering_model(model_list)
-        ds_list.fit_generator(
-            gen_list, request_period=[100, 200, 300, 400], normalize=True
-        )
+        ds_list.fit_generator(gen_list, request_period=[100, 200, 300, 400], normalize=True)
 
         for i in range(len(ds_int.metrics_results)):
             int_metrics_i = ds_int.metrics_results[i]["metrics"]
             list_metrics_i = ds_list.metrics_results[i]["metrics"]
 
             for j in range(len(int_metrics_i)):
-                self.assertTrue(
-                    np.abs(int_metrics_i[j]["value"] - list_metrics_i[j]["value"])
-                    < self.TOL
-                )
+                self.assertTrue(np.abs(int_metrics_i[j]["value"] - list_metrics_i[j]["value"]) < self.TOL)
 
 
 if __name__ == "__main__":

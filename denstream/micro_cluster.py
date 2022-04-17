@@ -33,9 +33,7 @@ class MicroCluster:
         self.cf1_func = utils.numba_cf1
         self.cf2_func = utils.numba_cf2
 
-    def append(
-        self, time: int, feature_array: np.ndarray, label: Optional[int] = None
-    ) -> None:
+    def append(self, time: int, feature_array: np.ndarray, label: Optional[int] = None) -> None:
         """
         This function appends data-points to the features / time / labels arrays.
 
@@ -74,19 +72,13 @@ class MicroCluster:
         if len(self.features_array) == 0:
             pass
         else:
-            self.features_array = np.delete(
-                self.features_array, [len(self.features_array) - 1], axis=0
-            )
-            self.time_array = np.delete(
-                self.time_array, [len(self.time_array) - 1], axis=0
-            )
+            self.features_array = np.delete(self.features_array, [len(self.features_array) - 1], axis=0)
+            self.time_array = np.delete(self.time_array, [len(self.time_array) - 1], axis=0)
 
         if len(self.labels_array) == 0:
             pass
         else:
-            self.labels_array = np.delete(
-                self.labels_array, [len(self.labels_array) - 1], axis=0
-            )
+            self.labels_array = np.delete(self.labels_array, [len(self.labels_array) - 1], axis=0)
 
     def _calculate_fading(self, time: int) -> np.ndarray:
         """
@@ -112,9 +104,7 @@ class MicroCluster:
         cf1 = self.cf1_func(self.features_array, fading_array)
         cf2 = self.cf2_func(self.features_array, fading_array)
 
-        radius_squared = np.sum(np.abs(cf2), axis=1) / weight - 1 / np.power(
-            weight, 2
-        ) * np.dot(cf1, cf1.T)
+        radius_squared = np.sum(np.abs(cf2), axis=1) / weight - 1 / np.power(weight, 2) * np.dot(cf1, cf1.T)
         radius_squared = radius_squared if radius_squared > 0 else 0
         radius = np.sqrt(radius_squared)
 
@@ -132,9 +122,7 @@ class MicroCluster:
         """
 
         if "time" in kwargs:
-            fading_array = utils.fading_function(
-                self.lambd, kwargs["time"] - self.time_array
-            )
+            fading_array = utils.fading_function(self.lambd, kwargs["time"] - self.time_array)
             weight = np.sum(fading_array, axis=0)
             self.weight = weight
             self.center = self.cf1_func(self.features_array, fading_array) / weight
