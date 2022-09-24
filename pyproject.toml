@@ -1,2 +1,10 @@
+[tool.mypy]
+ignore_missing_imports = true
+exclude = 'setup.py|build'  # FIXME: setup.py temporary fix for: https://github.com/python/mypy/issues/13627
+
 [tool.black]
 line-length = 128
+
+[tool.isort]
+line_length = 128
+profile = "black"
