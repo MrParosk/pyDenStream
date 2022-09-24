@@ -1,5 +1,5 @@
 from inspect import isfunction
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Literal, Optional, Union
 from warnings import warn
 
 import numpy as np
@@ -27,7 +27,7 @@ class DenStream:
         min_samples: int,
         label_metrics_list: List[Callable] = [],
         no_label_metrics_list: List[Callable] = [],
-        distance_measure: Optional[str] = None,
+        distance_measure: Union[None, float, Literal["fro", "nuc"]] = None,
     ):
         """
         :param epsilon: The radius used by the micro-cluster and DBScan.
