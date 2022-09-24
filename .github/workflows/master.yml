@@ -34,6 +34,10 @@ jobs:
         black . --check
     - name: Unit-tests with coverage
       run: |
-        pytest --mypy --cov=./ --cov-report=xml
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          pytest --mypy --cov=./ --cov-report=xml
+        else
+          pytest .
+        fi
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
