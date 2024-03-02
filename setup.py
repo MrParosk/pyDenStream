@@ -13,5 +13,5 @@ setup(
     packages=["denstream"],
     install_requires=required,
     setup_requires=["wheel"],
-    python_requires=">=3.8, <3.12",
+    python_requires=">=3.8, <3.13",
 )
