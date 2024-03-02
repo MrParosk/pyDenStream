@@ -1,8 +1,8 @@
-name: master
+name: CI checks
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: ["*"]
 
 jobs:
   code-coverage:
