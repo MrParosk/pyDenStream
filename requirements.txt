@@ -1,3 +1,3 @@
-numba>=0.56.2,<=0.58.1
-numpy>=1.23,<=1.26.3
-scikit-learn>=1.0,<=1.3.2
+numba>=0.56.2
+numpy>=1.23
+scikit-learn>=1.0
