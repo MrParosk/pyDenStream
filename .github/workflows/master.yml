@@ -1,41 +1,50 @@
 name: master
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
 jobs:
-  linting-code-coverage:
+  code-coverage:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.12'
     - name: Install
       run: |
         pip install .
         pip install -r requirements-dev.txt
-    - name: flake8 check
-      run: |
-        flake8 .
-    - name: isort check
-      run: |
-        isort . --check
-    - name: black check
-      run: |
-        black . --check
-    - name: mypy check
-      run: |
-        mypy .
     - name: Unit-tests with coverage
       run: |
         pytest --cov=./ --cov-report=xml
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@@v4
+
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - uses: pre-commit/action@v3.0.1
+
+  run_lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install dev dependencies
+      run: |
+        pip install -r requirements-dev.txt
+    - name: Run linting
+      shell: bash
+      run: |
+        bash scripts/ci_checks.sh
 
   unit-tests:
     runs-on: ${{ matrix.os }}
