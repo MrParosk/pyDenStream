@@ -10,10 +10,23 @@ requires-python = ">=3.8, <3.13"
 authors = [
     {name = "MrParosk"}
 ]
-dynamic = ["dependencies"]
 
-[tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
+dependencies = [
+    "numba>=0.56.2",
+    "numpy>=1.23",
+    "scikit-learn>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black==24.2.0",
+    "isort==5.13.2",
+    "mypy==1.8.0",
+    "pre-commit==3.6.2",
+    "pytest==8.0.2",
+    "pytest-cov==4.1.0",
+    "ruff==0.3.0"
+]
 
 [tool.mypy]
 ignore_missing_imports = true
