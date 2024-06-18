@@ -13,7 +13,7 @@ authors = [
 
 dependencies = [
     "numba>=0.56.2",
-    "numpy>=1.23,<2.0",
+    "numpy>=1.23,<3.0",
     "scikit-learn>=1.0",
 ]
 
