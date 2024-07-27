@@ -7,9 +7,30 @@ Implementation of the algorithm [Density-Based Clustering over an Evolving Data 
 ## Installation
 
 ```Shell
-pip install git+https://github.com/MrParosk/pyDenStream.git
+pip install denstream
 ```
 
-## Example
+## Example usage
 
-An example of how to use this package is included in *examples/user_guide.ipynb*.
+```python
+import numpy as np
+from denstream import DenStream
+
+# Model parameters
+eps = 0.3
+lambd = 0.1
+beta = 0.2
+mu = 10
+min_samples = 1
+
+model = DenStream(eps, beta, mu, lambd, min_samples)
+
+x = np.array([[1, 2]])
+t = 0
+
+model.partial_fit(x, t)
+```
+
+## In depth example
+
+A more in depth example of how to use this package is included in *examples/user_guide.ipynb*.
