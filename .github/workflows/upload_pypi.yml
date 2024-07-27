@@ -1,3 +1,5 @@
+name: Upload to pypi
+
 on: workflow_dispatch
 
 jobs:
