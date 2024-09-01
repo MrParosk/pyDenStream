@@ -1,5 +1,5 @@
 from inspect import isfunction
-from typing import Any, Callable, Dict, List, Literal, Optional, Union
+from typing import Any, Callable, Dict, Iterator, List, Literal, Optional, Union
 from warnings import warn
 
 import numpy as np
@@ -7,6 +7,7 @@ import sklearn.cluster
 from sklearn.base import BaseEstimator
 
 from denstream import micro_cluster, preprocessing
+from denstream.typing import FloatArrayType, InputDict, IntFloatArrayType, MetricsDict
 
 
 class DenStream:
@@ -25,8 +26,8 @@ class DenStream:
         mu: int,
         lambd: float,
         min_samples: int,
-        label_metrics_list: List[Callable] = [],
-        no_label_metrics_list: List[Callable] = [],
+        label_metrics_list: List[Callable[[IntFloatArrayType, IntFloatArrayType], float]] = [],
+        no_label_metrics_list: List[Callable[[FloatArrayType, IntFloatArrayType], float]] = [],
         distance_measure: Union[None, float, Literal["fro", "nuc"]] = None,
     ):
         """
@@ -74,7 +75,7 @@ class DenStream:
             n_jobs=-1,
         )
 
-    def _find_closest_cluster(self, cluster_list: List[micro_cluster.MicroCluster], feature_array: np.ndarray) -> int:
+    def _find_closest_cluster(self, cluster_list: List[micro_cluster.MicroCluster], feature_array: FloatArrayType) -> int:
         """
         Function for finding the closest cluster for a given point p (feature_array).
 
@@ -97,10 +98,10 @@ class DenStream:
         :return: The xi value.
         """
 
-        xi = (np.power(2, -self.lambd * (time - creation_time + self.Tp)) - 1) / (np.power(2, -self.lambd * self.Tp) - 1)
+        xi: float = (np.power(2, -self.lambd * (time - creation_time + self.Tp)) - 1) / (np.power(2, -self.lambd * self.Tp) - 1)
         return xi
 
-    def _merging(self, current_time: int, feature_array: np.ndarray, label: Optional[int] = None) -> None:
+    def _merging(self, current_time: int, feature_array: FloatArrayType, label: Optional[int] = None) -> None:
         """
         The merging step of a point p (feature_array) as described in the paper.
 
@@ -181,7 +182,7 @@ class DenStream:
 
     def partial_fit(
         self,
-        feature_array: np.ndarray,
+        feature_array: FloatArrayType,
         time: int,
         label: Optional[int] = None,
         request_period: Optional[Any] = None,
@@ -216,7 +217,7 @@ class DenStream:
 
     def fit_generator(
         self,
-        generator,
+        generator: Iterator[InputDict],
         normalize: bool = False,
         request_period: Optional[Any] = None,
         warmup_period: int = 1,
@@ -317,7 +318,7 @@ class DenStream:
         else:
             self.metrics_results.append({"iteration": iteration, "metrics": None})
 
-    def _request_clustering(self) -> np.ndarray:
+    def _request_clustering(self) -> FloatArrayType:
         """
         Clustering based on self.model for the p-micro-clusters.
 
@@ -327,14 +328,14 @@ class DenStream:
         if len(self.p_micro_clusters) > 0:
             center_array = np.concatenate([c.center for c in self.p_micro_clusters], axis=0)
         else:
-            return np.empty(0)
+            return np.empty(0, dtype=np.float32)
 
         # TODO: Should the new clusters be connected? I.e. if micro-cluster 1 and 2 and connected, should they be merged
         local_model = sklearn.base.clone(self.model)
-        predicted_labels = local_model.fit_predict(center_array)
+        predicted_labels: FloatArrayType = local_model.fit_predict(center_array)
         return predicted_labels
 
-    def _compute_label_metrics(self, predicted_labels: np.ndarray) -> List[Dict[str, float]]:
+    def _compute_label_metrics(self, predicted_labels: FloatArrayType) -> List[MetricsDict]:
         """
         Compute the label metrics given the predicted labels.
 
@@ -357,11 +358,11 @@ class DenStream:
         results = []
         for metric in self.label_metrics_list:
             val = metric(true_array, predicted_array)
-            result_dict = {"name": metric.__name__, "value": val}
+            result_dict = MetricsDict(name=metric.__name__, value=val)
             results.append(result_dict)
         return results
 
-    def _compute_no_label_metric(self, predicted_labels: np.ndarray) -> List[Dict[str, float]]:
+    def _compute_no_label_metric(self, predicted_labels: FloatArrayType) -> List[MetricsDict]:
         """
         Compute the no-label metrics given the predicted labels.
 
@@ -384,7 +385,7 @@ class DenStream:
         results = []
         for metric in self.no_label_metrics_list:
             val = metric(combined_feature_array, predicted_array)
-            result_dict = {"name": metric.__name__, "value": val}
+            result_dict = MetricsDict(name=metric.__name__, value=val)
             results.append(result_dict)
         return results
 
@@ -427,16 +428,16 @@ class DenStream:
         if self.beta * self.mu <= 1.0:
             raise ValueError("beta * mu <= 1.0 which will cause problems when computing Tp.")
 
-        for metric in self.label_metrics_list:
-            if not isfunction(metric):
+        for label_metric in self.label_metrics_list:
+            if not isfunction(label_metric):
                 raise ValueError("The label metric input(s) must be a function.")
 
-        for metric in self.no_label_metrics_list:
-            if not isfunction(metric):
+        for no_label_metric in self.no_label_metrics_list:
+            if not isfunction(no_label_metric):
                 raise ValueError("The no-label metric input(s) must be a function.")
 
     @staticmethod
-    def _validate_fit_input(time: int, feature_array: np.ndarray, label: Optional[int] = None) -> None:
+    def _validate_fit_input(time: int, feature_array: FloatArrayType, label: Optional[int] = None) -> None:
         """
         Validate the fit_generator's input parameters.
 

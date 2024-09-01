@@ -75,6 +75,9 @@ class TestMicroCluster(unittest.TestCase):
         expected_radius = np.sqrt(expected_c2 - expected_c1)
         estimated_radius, _, _ = mc.calculate_radius(t)
 
+        print(expected_radius)
+        print(estimated_radius)
+
         self.assertTrue(np.abs(estimated_radius - expected_radius) < self.TOL)
 
     def test_adding_updating(self):
