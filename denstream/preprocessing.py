@@ -2,13 +2,15 @@ from typing import Tuple
 
 import numpy as np
 
+from denstream.typing import FloatArrayType
+
 
 class RollingStats:
     """
     This class implements rolling statistics, i.e. mean and variance are updated for each new data-point.
     """
 
-    def __init__(self, dim: Tuple, eps: float = 1e-10):
+    def __init__(self, dim: Tuple[int, ...], eps: float = 1e-10):
         """
         Initializing the rolling statistics class.
 
@@ -26,7 +28,7 @@ class RollingStats:
         self.num_data_points = 0
         self.eps = eps
 
-    def update_statistics(self, x: np.ndarray) -> None:
+    def update_statistics(self, x: FloatArrayType) -> None:
         """
         Updating the mean and variance according to x. The  update equations can be found here:
             https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance.
@@ -45,7 +47,7 @@ class RollingStats:
         self.sse = self.sse.reshape(self.dim)
         self.variance = self.sse / self.num_data_points
 
-    def normalize(self, x: np.ndarray) -> np.ndarray:
+    def normalize(self, x: FloatArrayType) -> FloatArrayType:
         """
         Normalizing the input data.
 

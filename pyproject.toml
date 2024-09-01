@@ -33,7 +33,11 @@ dev = [
 
 [tool.mypy]
 ignore_missing_imports = true
-exclude = "build"
+strict = true
+exclude = [
+    "build",
+    "tests"
+]
 
 [tool.black]
 line-length = 128

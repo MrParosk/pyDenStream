@@ -1,8 +1,10 @@
 from typing import Optional, Tuple
 
 import numpy as np
+from typing_extensions import Unpack
 
 from denstream import utils
+from denstream.typing import FloatArrayType, UpdateParameters
 
 
 class MicroCluster:
@@ -23,17 +25,17 @@ class MicroCluster:
         self.lambd = lambd
         self.creation_time = creation_time
 
-        self.features_array = np.array([])
-        self.time_array = np.array([])
-        self.labels_array = np.array([])
+        self.features_array = np.array([], dtype=np.float32)
+        self.time_array = np.array([], dtype=np.int32)
+        self.labels_array = np.array([], dtype=np.int32)
 
-        self.weight = np.nan
-        self.center = np.array([])
+        self.weight = np.array(np.nan, dtype=np.float32)
+        self.center = np.array([], dtype=np.float32)
 
         self.cf1_func = utils.numba_cf1
         self.cf2_func = utils.numba_cf2
 
-    def append(self, time: int, feature_array: np.ndarray, label: Optional[int] = None) -> None:
+    def append(self, time: int, feature_array: FloatArrayType, label: Optional[int] = None) -> None:
         """
         This function appends data-points to the features / time / labels arrays.
 
@@ -80,7 +82,7 @@ class MicroCluster:
         else:
             self.labels_array = np.delete(self.labels_array, [len(self.labels_array) - 1], axis=0)
 
-    def _calculate_fading(self, time: int) -> np.ndarray:
+    def _calculate_fading(self, time: int) -> FloatArrayType:
         """
         This function calculates the fading values for time for this micro-cluster.
 
@@ -90,7 +92,7 @@ class MicroCluster:
 
         return utils.fading_function(self.lambd, time - self.time_array)
 
-    def calculate_radius(self, time: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def calculate_radius(self, time: int) -> Tuple[FloatArrayType, FloatArrayType, FloatArrayType]:
         """
         Calculating the radius of a micro-cluster according to the paper
             https://archive.siam.org/meetings/sdm06/proceedings/030caof.pdf.
@@ -110,7 +112,7 @@ class MicroCluster:
 
         return radius, weight, cf1
 
-    def update_parameters(self, **kwargs) -> None:
+    def update_parameters(self, **kwargs: Unpack[UpdateParameters]) -> None:
         """
         Updating the weight and center parameter for the micro-cluster.
         There is two modes:
