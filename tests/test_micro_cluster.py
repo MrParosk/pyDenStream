@@ -52,9 +52,9 @@ class TestMicroCluster(unittest.TestCase):
         lambd = 0.5
 
         # Feature-arrays
-        x1 = np.array([1, 2]).reshape((1, 2))
-        x2 = np.array([4, 5]).reshape((1, 2))
-        x3 = np.array([0, 0]).reshape((1, 2))
+        x1 = np.array([1, 2], dtype=np.float32).reshape((1, 2))
+        x2 = np.array([4, 5], dtype=np.float32).reshape((1, 2))
+        x3 = np.array([0, 0], dtype=np.float32).reshape((1, 2))
 
         # Time values
         t1 = 1.0
@@ -74,9 +74,6 @@ class TestMicroCluster(unittest.TestCase):
 
         expected_radius = np.sqrt(expected_c2 - expected_c1)
         estimated_radius, _, _ = mc.calculate_radius(t)
-
-        print(expected_radius)
-        print(estimated_radius)
 
         self.assertTrue(np.abs(estimated_radius - expected_radius) < self.TOL)
 
