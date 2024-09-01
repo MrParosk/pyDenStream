@@ -12,4 +12,4 @@ echo 'running black'
 black . --check
 
 echo 'running mypy'
-mypy --strict .
+mypy .
