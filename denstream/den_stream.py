@@ -7,7 +7,7 @@ import sklearn.cluster
 from sklearn.base import BaseEstimator
 
 from denstream import micro_cluster, preprocessing
-from denstream.typing import FloatArrayType, InputDict, IntFloatArrayType, MetricsDict
+from denstream.typing import FloatArrayType, InputDict, IntArrayType, MetricsDict
 
 
 class DenStream:
@@ -26,8 +26,8 @@ class DenStream:
         mu: int,
         lambd: float,
         min_samples: int,
-        label_metrics_list: List[Callable[[IntFloatArrayType, IntFloatArrayType], float]] = [],
-        no_label_metrics_list: List[Callable[[FloatArrayType, IntFloatArrayType], float]] = [],
+        label_metrics_list: List[Callable[[IntArrayType, IntArrayType], float]] = [],
+        no_label_metrics_list: List[Callable[[FloatArrayType, IntArrayType], float]] = [],
         distance_measure: Union[None, float, Literal["fro", "nuc"]] = None,
     ):
         """

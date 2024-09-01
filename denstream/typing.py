@@ -3,7 +3,7 @@ from typing import Optional, TypedDict
 import numpy as np
 
 FloatArrayType = np.typing.NDArray[np.float32]
-IntFloatArrayType = np.typing.NDArray[np.int32]
+IntArrayType = np.typing.NDArray[np.int32]
 
 
 class InputDict(TypedDict):

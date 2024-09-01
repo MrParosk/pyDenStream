@@ -1,11 +1,10 @@
 import numpy as np
 from numba import jit
-from numpy.typing import NDArray
 
-from denstream.typing import FloatArrayType
+from denstream.typing import FloatArrayType, IntArrayType
 
 
-def fading_function(lambd: float, time: NDArray[np.int32]) -> FloatArrayType:
+def fading_function(lambd: float, time: IntArrayType) -> FloatArrayType:
     """
     Calculating the fading value.
 
