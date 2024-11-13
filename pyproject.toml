@@ -7,7 +7,7 @@ name = "denstream"
 version = "0.1.1"
 description = "Implementation of the DenStream algorithm"
 readme = "README.md"
-requires-python = ">=3.8, <3.13"
+requires-python = ">=3.9, <3.13"
 authors = [
     {name = "MrParosk"}
 ]
@@ -20,14 +20,14 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "black==24.4.2",
+    "black==24.10.0",
     "isort==5.13.2",
-    "mypy==1.10.0",
-    "pre-commit==3.7.1",
-    "pytest==8.2.2",
-    "pytest-cov==5.0.0",
-    "ruff==0.4.9",
-    "build==1.2.1",
+    "mypy==1.13.0",
+    "pre-commit==4.0.1",
+    "pytest==8.3.3",
+    "pytest-cov==6.0.0",
+    "ruff==0.7.3",
+    "build==1.2.2",
     "twine==5.1.1",
 ]
 
