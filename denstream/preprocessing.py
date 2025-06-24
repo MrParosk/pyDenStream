@@ -20,13 +20,13 @@ class RollingStats:
         """
 
         self.dim = dim
-        self.mean = np.zeros(self.dim)
+        self.mean = np.zeros(self.dim, dtype=np.float32)
 
-        self.variance = np.zeros(self.dim)
-        self.sse = np.zeros(self.dim)
+        self.variance = np.zeros(self.dim, dtype=np.float32)
+        self.sse = np.zeros(self.dim, dtype=np.float32)
 
-        self.num_data_points = 0
-        self.eps = eps
+        self.num_data_points = np.float32(0.0)
+        self.eps = np.float32(eps)
 
     def update_statistics(self, x: FloatArrayType) -> None:
         """
@@ -37,7 +37,7 @@ class RollingStats:
         :return:
         """
 
-        self.num_data_points += 1
+        self.num_data_points += np.float32(1.0)
 
         old_mean = self.mean
         self.mean = self.mean + (x - self.mean) / self.num_data_points

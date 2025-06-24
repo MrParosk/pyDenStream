@@ -13,7 +13,7 @@ def fading_function(lambd: float, time: IntArrayType) -> FloatArrayType:
     :return: The calculated fading array.
     """
 
-    return np.power(2, -lambd * time, dtype=np.float32)
+    return np.power(2, -lambd * time, dtype=np.float32)  # type: ignore
 
 
 def numpy_cf1(x: FloatArrayType, fading_array: FloatArrayType) -> FloatArrayType:

@@ -308,7 +308,7 @@ class DenStream:
             if len(self.label_metrics_list) > 0:
                 metrics += self._compute_label_metrics(predicted_labels)
             if len(self.no_label_metrics_list) > 0:
-                # Checking that we have atleast two clusters (exluding outlier clusters, i.e. label=-1).
+                # Checking that we have at-least two clusters (excluding outlier clusters, i.e. label=-1).
                 if len(set(predicted_labels[predicted_labels != -1])) > 1:
                     metrics += self._compute_no_label_metric(predicted_labels)
                 else:
@@ -318,7 +318,7 @@ class DenStream:
         else:
             self.metrics_results.append({"iteration": iteration, "metrics": None})
 
-    def _request_clustering(self) -> FloatArrayType:
+    def _request_clustering(self) -> IntArrayType:
         """
         Clustering based on self.model for the p-micro-clusters.
 
@@ -328,14 +328,14 @@ class DenStream:
         if len(self.p_micro_clusters) > 0:
             center_array = np.concatenate([c.center for c in self.p_micro_clusters], axis=0)
         else:
-            return np.empty(0, dtype=np.float32)
+            return np.empty(0, dtype=np.int32)
 
         # TODO: Should the new clusters be connected? I.e. if micro-cluster 1 and 2 and connected, should they be merged
         local_model = sklearn.base.clone(self.model)
-        predicted_labels: FloatArrayType = local_model.fit_predict(center_array)
+        predicted_labels: IntArrayType = local_model.fit_predict(center_array)
         return predicted_labels
 
-    def _compute_label_metrics(self, predicted_labels: FloatArrayType) -> List[MetricsDict]:
+    def _compute_label_metrics(self, predicted_labels: IntArrayType) -> List[MetricsDict]:
         """
         Compute the label metrics given the predicted labels.
 
@@ -362,7 +362,7 @@ class DenStream:
             results.append(result_dict)
         return results
 
-    def _compute_no_label_metric(self, predicted_labels: FloatArrayType) -> List[MetricsDict]:
+    def _compute_no_label_metric(self, predicted_labels: IntArrayType) -> List[MetricsDict]:
         """
         Compute the no-label metrics given the predicted labels.
 
