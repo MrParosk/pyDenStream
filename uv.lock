@@ -106,7 +106,7 @@ toml = [
 
 [[package]]
 name = "denstream"
-version = "0.1.1"
+version = "0.1.2"
 source = { editable = "." }
 dependencies = [
     { name = "numba", version = "0.60.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
@@ -115,6 +115,7 @@ dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "scikit-learn", version = "1.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "scikit-learn", version = "1.7.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "typing-extensions" },
 ]
 
 [package.dev-dependencies]
@@ -131,6 +132,7 @@ requires-dist = [
     { name = "numba", specifier = ">=0.56" },
     { name = "numpy", specifier = ">=2.0" },
     { name = "scikit-learn", specifier = ">=1.0" },
+    { name = "typing-extensions", specifier = ">=4.14.0" },
 ]
 
 [package.metadata.requires-dev]
