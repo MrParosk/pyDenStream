@@ -3,6 +3,8 @@ name: CI checks
 on:
   pull_request:
     branches: ["*"]
+  push:
+    branches: [ master ]
 
 jobs:
   code-coverage:
