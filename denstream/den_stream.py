@@ -450,7 +450,7 @@ class DenStream:
         if not isinstance(feature_array, np.ndarray):
             raise ValueError(f"Provided x is not an numpy.ndarray, type(x)={type(feature_array)}")
         elif len(feature_array.shape) != 2:
-            raise ValueError(f"feature_array need to have the shape (1, num_features), " f"given shape={feature_array.shape}")
+            raise ValueError(f"feature_array need to have the shape (1, num_features), given shape={feature_array.shape}")
 
         if not isinstance(time, int):
             raise ValueError(f"Provided time is not an int. type(time)={type(time)}")
